@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+backend/venv/
+
+# Environment variables
+.env
+.env.local
+backend/.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS (Mac specific)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+
+# Node modules (for frontend later)
+node_modules/
+frontend/node_modules/# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+backend/venv/
+
+# Environment variables
+.env
+.env.local
+backend/.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS (Mac specific)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+
+# Node modules (for frontend later)
+node_modules/
+frontend/node_modules/
