@@ -4,6 +4,7 @@ Main FastAPI application entry point.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.api import research
 
 # Create FastAPI app
 app = FastAPI(
@@ -13,14 +14,17 @@ app = FastAPI(
     debug=settings.DEBUG
 )
 
-# CORS middleware - allows frontend to call our API
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(research.router, prefix="/api/research", tags=["research"])
 
 # Root endpoint
 @app.get("/")
