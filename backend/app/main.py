@@ -4,7 +4,7 @@ Main FastAPI application entry point.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import research
+from app.api import research, trips
 
 # Create FastAPI app
 app = FastAPI(
@@ -25,6 +25,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(research.router, prefix="/api/research", tags=["research"])
+app.include_router(trips.router, prefix="/api/trips", tags=["trips"])
 
 # Root endpoint
 @app.get("/")
@@ -34,7 +35,8 @@ async def root():
         "message": "Welcome to TripOptimizer API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
+        "agents": ["Research Agent", "Planning Agent"]
     }
 
 # Health check endpoint
@@ -43,7 +45,8 @@ async def health():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "app": settings.APP_NAME
+        "app": settings.APP_NAME,
+        "agents_active": 2
     }
 
 # Startup event
