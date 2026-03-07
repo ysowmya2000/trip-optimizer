@@ -9,7 +9,7 @@ from app.api import research, trips
 # Create FastAPI app
 app = FastAPI(
     title=settings.APP_NAME,
-    description="AI-powered travel itinerary planning with real-time optimization",
+    description="AI-powered travel itinerary planning with real-time optimization using 5 specialized agents",
     version="1.0.0",
     debug=settings.DEBUG
 )
@@ -36,7 +36,14 @@ async def root():
         "version": "1.0.0",
         "status": "running",
         "docs": "/docs",
-        "agents": ["Research Agent", "Planning Agent"]
+        "agents": [
+            "Research Agent",
+            "Planning Agent",
+            "Optimization Agent", 
+            "Budget Agent",
+            "Weather Agent"
+        ],
+        "orchestrator": "Multi-Agent Orchestrator"
     }
 
 # Health check endpoint
@@ -46,7 +53,7 @@ async def health():
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
-        "agents_active": 2
+        "agents_active": 5
     }
 
 # Startup event

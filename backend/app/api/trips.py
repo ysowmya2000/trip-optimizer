@@ -1,64 +1,32 @@
 """
 Trips API endpoints.
-Combines Research Agent + Planning Agent to create complete trip itineraries.
+Uses Multi-Agent Orchestrator to create complete optimized trips.
 """
 from fastapi import APIRouter, HTTPException
-from app.schemas.trip import TripRequest, TripResponse, Itinerary
-from app.agents.research_agent import research_agent
-from app.agents.planning_agent import planning_agent
+from app.schemas.trip import TripRequest
+from app.agents.orchestrator import trip_orchestrator
 
 # Create router
 router = APIRouter()
 
 
-@router.post("/create", response_model=TripResponse)
+@router.post("/create")
 async def create_trip(request: TripRequest):
     """
-    Create a complete trip itinerary.
+    Create a complete optimized trip itinerary.
     
-    This endpoint orchestrates:
-    1. Research Agent - finds attractions
-    2. Planning Agent - creates day-by-day itinerary
+    This endpoint uses the Multi-Agent Orchestrator which coordinates:
+    1. Research Agent - Finds attractions
+    2. Planning Agent - Creates day-by-day itinerary
+    3. Optimization Agent - Optimizes routes
+    4. Budget Agent - Analyzes costs
+    5. Weather Agent - Checks forecast
     
-    Returns a complete trip plan with daily schedules.
+    Returns complete trip package with all analysis.
     """
     try:
-        print(f"\n🚀 Creating trip to {request.destination}...")
-        
-        # Step 1: Research attractions
-        print("Step 1: Researching attractions...")
-        research_result = research_agent.research_destination(
-            destination=request.destination,
-            interests=request.interests,
-            trip_duration=request.trip_duration
-        )
-        
-        attractions = research_result.get('top_attractions', [])
-        
-        if not attractions:
-            return TripResponse(
-                success=False,
-                trip_request=request,
-                error="No attractions found for this destination"
-            )
-        
-        # Step 2: Create itinerary
-        print("Step 2: Creating itinerary...")
-        itinerary = planning_agent.create_itinerary(
-            destination=request.destination,
-            interests=request.interests,
-            attractions=attractions,
-            trip_duration=request.trip_duration,
-            budget=request.budget
-        )
-        
-        print(f"✅ Trip created successfully!")
-        
-        return TripResponse(
-            success=True,
-            trip_request=request,
-            itinerary=itinerary
-        )
+        result = trip_orchestrator.create_complete_trip(request)
+        return result
         
     except Exception as e:
         print(f"❌ Error creating trip: {e}")
@@ -67,10 +35,17 @@ async def create_trip(request: TripRequest):
 
 @router.get("/test")
 async def test_trips_endpoint():
-    """Test endpoint to verify trips API is working."""
+    """Test endpoint to verify all agents are operational."""
     return {
         "status": "operational",
-        "message": "Trips API is ready!",
+        "message": "Multi-Agent Trip Orchestrator ready!",
+        "agents": [
+            "Research Agent",
+            "Planning Agent", 
+            "Optimization Agent",
+            "Budget Agent",
+            "Weather Agent"
+        ],
         "endpoints": {
             "create_trip": "POST /api/trips/create"
         }
