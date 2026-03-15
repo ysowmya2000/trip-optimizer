@@ -460,21 +460,16 @@ trip-optimizer/
 
 ## 🚀 Deployment
 
-### Frontend (Vercel)
-```bash
-cd frontend
-vercel deploy --prod
-```
+### Current Status
 
-### Backend (Railway)
-```bash
-cd backend
-railway up
-```
+This application is currently configured for **local development and demonstration**.
+### Future Deployment Plans
 
-**Environment Variables (Railway)**:
-- `GROQ_API_KEY`
-- `GOOGLE_PLACES_API_KEY`
+The application is deployment-ready with configurations for:
+- **Frontend**: Vercel, Netlify, or GitHub Pages
+- **Backend**: Railway, Render, or AWS Lambda
+
+Deployment can be completed upon request for production use cases.
 
 ## 📈 Future Enhancements
 
