@@ -1,137 +1,95 @@
 """
-Weather Agent - Monitors weather and suggests activity adaptations.
+Weather Agent - Provides seasonal weather forecast based on travel dates.
 """
-from typing import List, Dict
-from app.schemas.trip import Itinerary, DayPlan
-from app.external.weather import weather_client
+from datetime import datetime
+from typing import Dict, Optional
 
 
 class WeatherAgent:
-    """Agent responsible for weather monitoring and activity adaptation."""
+    """Agent for seasonal weather forecasting."""
+    
+    # Seasonal weather data for major cities
+    SEASONAL_WEATHER = {
+        'bangkok': {
+            'hot_season': {'months': [3, 4, 5], 'temp': '28-35°C', 'condition': 'Hot & Humid', 'advice': 'Pack light, breathable clothes. Stay hydrated.'},
+            'rainy_season': {'months': [6, 7, 8, 9, 10], 'temp': '25-32°C', 'condition': 'Monsoon Rains', 'advice': 'Bring umbrella and rain jacket. Expect afternoon showers.'},
+            'cool_season': {'months': [11, 12, 1, 2], 'temp': '20-30°C', 'condition': 'Warm & Pleasant', 'advice': 'Best time to visit! Pack light layers.'}
+        },
+        'paris': {
+            'spring': {'months': [3, 4, 5], 'temp': '8-18°C', 'condition': 'Mild & Blooming', 'advice': 'Pack layers. Light jacket needed.'},
+            'summer': {'months': [6, 7, 8], 'temp': '15-25°C', 'condition': 'Warm & Sunny', 'advice': 'Light summer clothes. Sunscreen recommended.'},
+            'fall': {'months': [9, 10, 11], 'temp': '8-18°C', 'condition': 'Cool & Crisp', 'advice': 'Jacket and layers. Beautiful foliage.'},
+            'winter': {'months': [12, 1, 2], 'temp': '1-8°C', 'condition': 'Cold & Occasional Snow', 'advice': 'Warm coat, scarf, gloves essential.'}
+        },
+        'london': {
+            'spring': {'months': [3, 4, 5], 'temp': '6-15°C', 'condition': 'Mild & Rainy', 'advice': 'Umbrella essential. Light layers.'},
+            'summer': {'months': [6, 7, 8], 'temp': '14-23°C', 'condition': 'Warm & Unpredictable', 'advice': 'Light clothes + rain jacket.'},
+            'fall': {'months': [9, 10, 11], 'temp': '8-16°C', 'condition': 'Cool & Rainy', 'advice': 'Waterproof jacket. Warm layers.'},
+            'winter': {'months': [12, 1, 2], 'temp': '2-8°C', 'condition': 'Cold & Damp', 'advice': 'Heavy coat, umbrella, warm layers.'}
+        },
+        'tokyo': {
+            'spring': {'months': [3, 4, 5], 'temp': '10-20°C', 'condition': 'Cherry Blossoms & Mild', 'advice': 'Light jacket. Beautiful season!'},
+            'summer': {'months': [6, 7, 8], 'temp': '22-32°C', 'condition': 'Hot & Humid', 'advice': 'Light clothes. Stay hydrated.'},
+            'fall': {'months': [9, 10, 11], 'temp': '12-22°C', 'condition': 'Pleasant & Colorful', 'advice': 'Light layers. Great weather!'},
+            'winter': {'months': [12, 1, 2], 'temp': '2-12°C', 'condition': 'Cold & Dry', 'advice': 'Warm coat and layers needed.'}
+        }
+    }
     
     def __init__(self):
-        """Initialize Weather Agent."""
         self.name = "Weather Agent"
-        print(f"🌤️  {self.name} initialized")
+        print(f"🌤️ {self.name} initialized")
     
-    def check_weather(self, itinerary: Itinerary) -> Dict:
-        """
-        Check weather forecast for trip and provide recommendations.
+    def get_seasonal_forecast(self, destination: str, start_date: Optional[str] = None) -> Dict:
+        """Get seasonal weather forecast for destination and travel date."""
+        print(f"\n🌤️ {self.name}: Getting seasonal forecast for {destination}...")
         
-        Args:
-            itinerary: Trip itinerary
-            
-        Returns:
-            Weather analysis with recommendations
-        """
-        print(f"\n🌤️  {self.name}: Checking weather for {itinerary.destination}...")
+        # Parse travel month
+        if start_date:
+            try:
+                date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+                travel_month = date_obj.month
+                month_name = date_obj.strftime('%B')
+                print(f"   📅 Travel month: {month_name} (Month {travel_month})")
+            except:
+                travel_month = datetime.now().month
+                month_name = datetime.now().strftime('%B')
+        else:
+            travel_month = datetime.now().month
+            month_name = datetime.now().strftime('%B')
         
-        # Get forecast
-        forecast = weather_client.get_forecast(
-            itinerary.destination, 
-            days=itinerary.trip_duration
-        )
+        # Get city-specific weather
+        dest_lower = destination.lower()
+        city_weather = None
         
-        # Analyze each day
-        daily_weather = []
-        rainy_days = []
+        for city, seasons in self.SEASONAL_WEATHER.items():
+            if city in dest_lower:
+                city_weather = seasons
+                break
         
-        for i, day in enumerate(itinerary.days):
-            if i < len(forecast):
-                day_forecast = forecast[i]
-                daily_weather.append({
-                    "day_number": day.day_number,
-                    "date": day_forecast.get("date"),
-                    "condition": day_forecast.get("condition"),
-                    "temp_high": day_forecast.get("temp_high"),
-                    "temp_low": day_forecast.get("temp_low"),
-                    "is_rainy": day_forecast.get("is_rainy", False)
-                })
-                
-                if day_forecast.get("is_rainy"):
-                    rainy_days.append(day.day_number)
+        # Find matching season
+        if city_weather:
+            for season_name, season_data in city_weather.items():
+                if travel_month in season_data['months']:
+                    print(f"   ✅ Season: {season_name.replace('_', ' ').title()}")
+                    return {
+                        'destination': destination,
+                        'month': month_name,
+                        'season': season_name.replace('_', ' ').title(),
+                        'temperature': season_data['temp'],
+                        'condition': season_data['condition'],
+                        'advice': season_data['advice']
+                    }
         
-        # Generate recommendations
-        recommendations = self._generate_weather_recommendations(
-            itinerary, 
-            daily_weather,
-            rainy_days
-        )
-        
-        analysis = {
-            "destination": itinerary.destination,
-            "forecast": daily_weather,
-            "rainy_days": rainy_days,
-            "recommendations": recommendations,
-            "needs_adaptation": len(rainy_days) > 0
+        # Default forecast for unknown cities
+        print(f"   ℹ️  Using general forecast")
+        return {
+            'destination': destination,
+            'month': month_name,
+            'season': 'Variable',
+            'temperature': '15-25°C',
+            'condition': 'Check local weather closer to travel date',
+            'advice': 'Pack versatile clothing layers.'
         }
-        
-        print(f"✅ {self.name}: Weather check complete - {len(rainy_days)} rainy days detected")
-        return analysis
-    
-    def _generate_weather_recommendations(
-        self,
-        itinerary: Itinerary,
-        daily_weather: List[Dict],
-        rainy_days: List[int]
-    ) -> List[str]:
-        """Generate weather-based recommendations."""
-        recommendations = []
-        
-        if not rainy_days:
-            recommendations.append("☀️ Great news! Weather looks good throughout your trip!")
-            return recommendations
-        
-        recommendations.append(f"🌧️ Rain expected on {len(rainy_days)} day(s): Day {', '.join(map(str, rainy_days))}")
-        recommendations.append("💡 Suggested adaptations:")
-        
-        for day_num in rainy_days:
-            # Find the day
-            day = next((d for d in itinerary.days if d.day_number == day_num), None)
-            if day:
-                # Count outdoor activities
-                outdoor_activities = [
-                    act for act in day.activities 
-                    if act.activity_type == "attraction"
-                ]
-                
-                if outdoor_activities:
-                    recommendations.append(
-                        f"  Day {day_num} ({day.title}): Consider indoor alternatives"
-                    )
-                    recommendations.append(
-                        "    - Museums, galleries, shopping malls"
-                    )
-                    recommendations.append(
-                        "    - Indoor markets, cooking classes"
-                    )
-                    recommendations.append(
-                        "    - Cafes, restaurants with extended stays"
-                    )
-        
-        recommendations.append("☂️ Pack: Umbrella, rain jacket, waterproof shoes")
-        
-        return recommendations
-    
-    def suggest_indoor_alternatives(self, outdoor_activity: str) -> List[str]:
-        """Suggest indoor alternatives for outdoor activities."""
-        indoor_alternatives = {
-            "park": ["Museum", "Art gallery", "Shopping mall", "Aquarium"],
-            "temple": ["Indoor shrine", "Cultural center", "History museum"],
-            "market": ["Indoor market", "Department store", "Shopping arcade"],
-            "beach": ["Aquarium", "Oceanographic museum", "Spa", "Indoor pool"],
-            "garden": ["Botanical conservatory", "Indoor garden", "Museum"]
-        }
-        
-        # Default alternatives
-        default = ["Museum", "Gallery", "Shopping center", "Indoor attraction"]
-        
-        for keyword, alternatives in indoor_alternatives.items():
-            if keyword in outdoor_activity.lower():
-                return alternatives
-        
-        return default
 
 
-# Create global instance
 weather_agent = WeatherAgent()

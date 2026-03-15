@@ -57,7 +57,8 @@ class TripRequest(BaseModel):
     destination: str = Field(..., example="Tokyo, Japan")
     interests: List[str] = Field(..., example=["temples", "food", "culture"])
     trip_duration: int = Field(default=7, ge=1, le=30)
-    budget: Optional[float] = Field(None, description="Budget in USD")
+    budget: Optional[float] = Field(None, description="Budget amount")
+    currency: Optional[str] = Field(default="USD", description="Currency code (USD, EUR, INR, etc.)")
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
 
 

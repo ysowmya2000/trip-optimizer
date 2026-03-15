@@ -1,186 +1,192 @@
 """
-Multi-Agent Orchestrator - Coordinates all agents to create optimized trips.
+Trip Orchestrator - Coordinates all agents to create complete trip
 """
-from typing import Dict, Optional
-from app.schemas.trip import TripRequest, Itinerary
+from typing import Dict, Any
+import logging
+
 from app.agents.research_agent import research_agent
 from app.agents.planning_agent import planning_agent
 from app.agents.optimization_agent import optimization_agent
 from app.agents.budget_agent import budget_agent
 from app.agents.weather_agent import weather_agent
+from app.utils.currency_converter import currency_converter
+from app.utils.budget_calculator import budget_calculator
+
+logger = logging.getLogger(__name__)
 
 
 class TripOrchestrator:
-    """
-    Orchestrates multiple agents to create complete, optimized trip itineraries.
-    
-    Workflow:
-    1. Research Agent - Find attractions
-    2. Planning Agent - Create initial itinerary
-    3. Optimization Agent - Optimize routes
-    4. Budget Agent - Analyze costs
-    5. Weather Agent - Check forecast and adapt
-    """
+    """Orchestrates multiple agents to create a complete trip plan"""
     
     def __init__(self):
-        """Initialize orchestrator."""
-        self.name = "Trip Orchestrator"
-        print(f"🎭 {self.name} initialized")
-        
-        # Agent instances
         self.research = research_agent
         self.planning = planning_agent
         self.optimization = optimization_agent
         self.budget = budget_agent
         self.weather = weather_agent
     
-    def create_complete_trip(self, request: TripRequest) -> Dict:
+    async def create_trip(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Create a complete, optimized trip using all agents.
-        
-        Args:
-            request: Trip request with destination, interests, etc.
-            
-        Returns:
-            Complete trip package with itinerary and analysis
+        Create complete trip using all agents
         """
-        print(f"\n{'='*60}")
-        print(f"🎭 {self.name}: Creating complete trip")
-        print(f"{'='*60}")
-        
-        result = {
-            "success": False,
-            "request": request.dict(),
-            "itinerary": None,
-            "optimization_report": None,
-            "budget_analysis": None,
-            "weather_forecast": None,
-            "warnings": [],
-            "recommendations": []
-        }
-        
         try:
-            # PHASE 1: Research
-            print(f"\n📍 PHASE 1: Research")
+            logger.info("=" * 80)
+            logger.info("🗺️ Trip Orchestrator: Creating complete trip")
+            logger.info("=" * 80)
+            
+            destination = request.get('destination')
+            interests = request.get('interests', [])
+            trip_duration = request.get('trip_duration', 3)
+            budget = request.get('budget', 1000)
+            start_date = request.get('start_date')
+
+            # Currency conversion setup
+            user_currency = request.get("currency", "USD")
+            destination_currency = "USD"  # Will be set later
+            original_budget = budget
+
+            
+
+            # Detect destination currency
+            destination_currency = currency_converter.get_destination_currency(destination)
+            logger.info(f"💱 Currency: {user_currency} → {destination_currency}")
+            
+            # Convert budget to USD for internal calculations
+            if budget and user_currency != "USD":
+                budget_usd = currency_converter.convert(budget, user_currency, "USD")
+                logger.info(f"   Budget in USD: ${budget_usd:.2f}")
+            else:
+                budget_usd = budget
+            
+            # Check minimum budget requirement
+            if original_budget:
+                min_budget_info = budget_calculator.calculate_minimum_budget(
+                    destination=destination,
+                    trip_duration=trip_duration,
+                    user_currency=user_currency
+                )
+                
+                logger.info(f"💰 Budget Check:")
+                logger.info(f"   Your budget: {currency_converter.format_currency(original_budget, user_currency)}")
+                logger.info(f"   Minimum needed: {currency_converter.format_currency(min_budget_info['minimum_budget_user'], user_currency)}")
+                
+                if original_budget < min_budget_info['minimum_budget_user'] * 0.95:  # Allow 5% tolerance
+                    logger.error(f"❌ Budget too low!")
+                    return {
+                        'success': False,
+                        'error': 'BUDGET_TOO_LOW',
+                        'message': f"Budget too low for {trip_duration} days in {destination}",
+                        'minimum_budget': min_budget_info['minimum_budget_user'],
+                        'user_budget': original_budget,
+                        'currency': user_currency,
+                        'destination': destination,
+                        'trip_duration': trip_duration
+                    }
+                logger.info(f"   ✅ Budget sufficient")
+
+            # Phase 1: Research
+            logger.info("📍 PHASE 1: Research")
             research_result = self.research.research_destination(
-                destination=request.destination,
-                interests=request.interests,
-                trip_duration=request.trip_duration
+                destination=destination,
+                interests=interests,
+                trip_duration=trip_duration
             )
             
+            # Extract attractions - use 'top_attractions' key
             attractions = research_result.get('top_attractions', [])
+            logger.info(f"📍 Extracted {len(attractions)} attractions from research")
             
-            if not attractions:
-                result["warnings"].append("No attractions found")
-                return result
-            
-            # PHASE 2: Planning
-            print(f"\n📍 PHASE 2: Planning")
-            initial_itinerary = self.planning.create_itinerary(
-                destination=request.destination,
-                interests=request.interests,
+            # Phase 2: Planning
+            logger.info("📍 PHASE 2: Planning")
+            itinerary = self.planning.create_itinerary(
+                destination=destination,
                 attractions=attractions,
-                trip_duration=request.trip_duration,
-                budget=request.budget
+                trip_duration=trip_duration,
+                interests=interests,
+                budget=budget_usd
             )
             
-            # PHASE 3: Optimization
-            print(f"\n📍 PHASE 3: Route Optimization")
+            # Convert all costs from USD to user's currency
+            logger.info(f"💱 Converting costs: USD → {user_currency}")
+            
+            # Convert total cost
+            itinerary.estimated_total_cost = currency_converter.convert(
+                itinerary.estimated_total_cost, "USD", user_currency
+            )
+            
+            # Convert each day's cost
+            for day in itinerary.days:
+                day.estimated_cost = currency_converter.convert(
+                    day.estimated_cost, "USD", user_currency
+                )
+            
+            logger.info(f"   Total cost: {currency_converter.format_currency(itinerary.estimated_total_cost, user_currency)}")
+
+            
+            # Phase 3: Optimization
+            logger.info("📍 PHASE 3: Route Optimization")
             optimized_itinerary = self.optimization.optimize_itinerary(
-                initial_itinerary
+                itinerary=itinerary
             )
             
-            result["itinerary"] = optimized_itinerary.dict()
-            
-            # PHASE 4: Budget Analysis
-            print(f"\n📍 PHASE 4: Budget Analysis")
+            # Phase 4: Budget Analysis
+            logger.info("📍 PHASE 4: Budget Analysis")
             budget_analysis = self.budget.analyze_budget(
-                optimized_itinerary,
-                budget=request.budget
+                itinerary=itinerary,
+                budget=original_budget,
+                user_currency=user_currency,
+                destination_currency=destination_currency
             )
             
-            result["budget_analysis"] = budget_analysis
-            
-            # Add budget warnings
-            if budget_analysis.get("budget_status") == "over_budget":
-                result["warnings"].append(
-                    f"Trip is over budget by ${budget_analysis.get('over_budget_amount', 0):.2f}"
-                )
-            
-            # PHASE 5: Weather Check
-            print(f"\n📍 PHASE 5: Weather Forecast")
-            weather_analysis = self.weather.check_weather(optimized_itinerary)
-            
-            result["weather_forecast"] = weather_analysis
-            
-            # Add weather warnings
-            if weather_analysis.get("needs_adaptation"):
-                rainy_days = weather_analysis.get("rainy_days", [])
-                result["warnings"].append(
-                    f"Rain expected on {len(rainy_days)} day(s)"
-                )
-            
-            # PHASE 6: Generate Final Recommendations
-            print(f"\n📍 PHASE 6: Final Recommendations")
-            recommendations = self._generate_final_recommendations(
-                optimized_itinerary,
-                budget_analysis,
-                weather_analysis
+            # Phase 5: Weather Forecast
+            logger.info("📍 PHASE 5: Weather Forecast")
+            weather_forecast = self.weather.get_seasonal_forecast(
+                destination=destination,
+                start_date=start_date
             )
             
-            result["recommendations"] = recommendations
-            result["success"] = True
+            # Phase 6: Combine recommendations
+            logger.info("📍 PHASE 6: Final Recommendations")
+            recommendations = {
+                "time_saved_minutes": optimized_itinerary.get('time_saved_minutes', 0),
+                "route_efficiency": optimized_itinerary.get('route_efficiency', 'standard')
+            }
             
-            print(f"\n{'='*60}")
-            print(f"✅ {self.name}: Trip creation complete!")
-            print(f"{'='*60}\n")
+            # Serialize itinerary object to dict
+            itinerary_dict = itinerary.dict() if hasattr(itinerary, 'dict') else itinerary
+            
+            # Add currency information
+            currency_info = {
+                'user_currency': user_currency,
+                'destination_currency': destination_currency,
+                'original_budget': original_budget,
+                'converted_budget': budget,
+                'budget_display': {
+                    'user': currency_converter.format_currency(original_budget, user_currency) if original_budget else None,
+                    'destination': currency_converter.format_currency(budget, destination_currency) if budget else None
+                }
+            }
+            
+            result = {
+                'success': True,
+                'request': request,
+                'itinerary': itinerary_dict,
+                'budget_analysis': budget_analysis,
+                'weather_forecast': weather_forecast,
+                'recommendations': recommendations,
+                'currency_info': currency_info
+            }
+            
+            logger.info("✅ Trip Orchestrator: Complete trip created successfully")
+            return result
             
         except Exception as e:
-            print(f"❌ {self.name}: Error creating trip - {e}")
-            result["error"] = str(e)
-        
-        return result
-    
-    def _generate_final_recommendations(
-        self,
-        itinerary: Itinerary,
-        budget_analysis: Dict,
-        weather_analysis: Dict
-    ) -> list:
-        """Generate final consolidated recommendations."""
-        recommendations = []
-        
-        # Trip summary
-        recommendations.append(
-            f"📅 {itinerary.trip_duration}-day trip to {itinerary.destination}"
-        )
-        recommendations.append(
-            f"🎯 {itinerary.total_attractions} attractions planned"
-        )
-        recommendations.append(
-            f"💰 Estimated cost: ${itinerary.estimated_total_cost:.2f}"
-        )
-        
-        # Budget recommendations
-        if budget_analysis.get("budget_status") == "over_budget":
-            recommendations.extend(budget_analysis.get("recommendations", [])[:3])
-        
-        # Weather recommendations
-        if weather_analysis.get("needs_adaptation"):
-            recommendations.extend(weather_analysis.get("recommendations", [])[:3])
-        
-        # General tips
-        recommendations.extend([
-            "",
-            "📝 General Tips:",
-            "  - Book accommodations in advance",
-            "  - Download offline maps",
-            "  - Learn basic local phrases",
-            "  - Check visa requirements"
-        ])
-        
-        return recommendations
+            logger.error(f"❌ Trip Orchestrator: Error creating trip - {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise
 
 
-# Create global instance
+# Create singleton instance
 trip_orchestrator = TripOrchestrator()
+logger.info("🗺️ Trip Orchestrator initialized")
