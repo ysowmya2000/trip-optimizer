@@ -492,7 +492,7 @@ This project is licensed under the MIT License.
 
 **Sowmya Yerraguntla**
 
-- LinkedIn: [Sowmya Yerraguntla](https://linkedin.com/in/sowmya-yerraguntla)
+- LinkedIn: [Sowmya Yerraguntla](https://www.linkedin.com/in/sowmyayerraguntla/)
 
 ## 📊 Project Stats
 
