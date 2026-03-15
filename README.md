@@ -489,15 +489,6 @@ railway up
 - [ ] Local SIM card suggestions
 - [ ] Restaurant reservations
 
-## 🤝 Contributing
-
-Contributions welcome! Please:
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
 ## 📄 License
 
 This project is licensed under the MIT License.
@@ -505,17 +496,8 @@ This project is licensed under the MIT License.
 ## 👨‍💻 Author
 
 **Sowmya Yerraguntla**
-- GitHub: [@ysowmya2000](https://github.com/ysowmya2000)
+
 - LinkedIn: [Sowmya Yerraguntla](https://linkedin.com/in/sowmya-yerraguntla)
-- Email: sy3057@columbia.edu
-
-## 🙏 Acknowledgments
-
-- Groq for fast LLM inference
-- Google Places API for attraction data
-- ChromaDB for vector database
-- Anthropic Claude for development assistance
-- Columbia University MS Data Science Program
 
 ## 📊 Project Stats
 
@@ -524,7 +506,7 @@ This project is licensed under the MIT License.
 - **Cities Supported**: 90+
 - **Currencies**: 49
 - **API Integrations**: 3 (Groq, Google Places, Google Maps)
-- **Development Time**: 2 weeks
+- **Development Time**: 4 weeks
 
 ---
 
