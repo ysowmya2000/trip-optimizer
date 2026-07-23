@@ -53,7 +53,12 @@ TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
 #### 1. **Research Agent** 🔍
 - **Purpose**: Discovers attractions using RAG + Google Places API
 - **Capabilities**:
-  - Semantic search in ChromaDB vector store
+  - Hybrid retrieval (BM25 keyword search + ChromaDB semantic search, fused
+    with Reciprocal Rank Fusion) over the local knowledge base, reranked with
+    a cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) - a standard
+    two-stage retrieval pattern: retrieve broad with hybrid search, rerank
+    precise with a cross-encoder. See [Evaluation Results](#-evaluation-results)
+    for before/after retrieval numbers.
   - Fetches top-rated attractions from Google Places
   - Combines RAG results with live API data
   - Selects `trip_duration × 5` attractions for variety
@@ -109,13 +114,16 @@ TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
 - **AI/ML**: 
   - Groq API (Llama 3.3 70B) for agent intelligence
   - ChromaDB for vector database & RAG
-  - Sentence Transformers for embeddings
+  - Hybrid retrieval: BM25 (`rank_bm25`) + semantic search, fused with
+    Reciprocal Rank Fusion, reranked with a cross-encoder
+    (`cross-encoder/ms-marco-MiniLM-L-6-v2` via `sentence-transformers`)
 - **APIs**:
   - Google Places API (attraction discovery)
   - Google Maps API (route visualization)
 - **Language**: Python 3.12
 - **Key Libraries**:
   - `chromadb` - Vector database
+  - `rank_bm25` - Keyword retrieval
   - `groq` - LLM API client
   - `pydantic` - Data validation
   - `httpx` - Async HTTP client
@@ -437,6 +445,11 @@ trip-optimizer/
 
 ## 🧪 Testing
 
+Automated eval harness: `backend/eval/` (see
+[Evaluation Results](#-evaluation-results) above). Run with
+`python -m eval.run_budget_eval`, `run_quality_eval`, or `run_retrieval_eval
+--mode {semantic,hybrid,reranked}` from `backend/`.
+
 ### Manual Testing Scenarios
 
 1. **Budget Rejection**:
@@ -458,18 +471,88 @@ trip-optimizer/
    - Paris March → Spring
    - London December → Winter
 
+## 📊 Evaluation Results
+
+Quantitative eval harness in `backend/eval/`, run against the real agent
+pipeline (not a mocked simplification) - see `backend/eval/results/` for the
+full per-case JSON reports.
+
+### Budget / Tier Accuracy
+
+44 synthetic test cases spanning the three city-cost tiers (expensive,
+moderate, budget) and budget levels, including boundary cases at tier
+cutoffs. Expected values are computed directly from `budget_calculator`'s
+actual logic, not hand-guessed.
+
+| Metric | Score |
+|---|---|
+| Tier assignment accuracy | 100% |
+| Attractions-per-day accuracy | 100% |
+| Budget status accuracy | 0%* |
+| Cost estimate mean deviation | 25.7% (n=11 hand-verified subset) |
+
+\* This isn't a harness bug - it's a real finding. `planning_agent`'s actual
+cost formula runs 25-40% cheaper than the tier-selection formula in
+`budget_calculator` predicts, so the pipeline reports "under budget" far
+more often than the tier math alone would suggest. The two formulas were
+never reconciled with each other; the eval surfaced the gap rather than
+papering over it.
+
+### Itinerary Quality
+
+Three rule-based dimensions scored per generated itinerary (44 cases):
+
+| Dimension | Score |
+|---|---|
+| Time-slot appropriateness | 97.4/100 |
+| Attraction diversity | 57.7/100 |
+| Interest-match rate | 100/100** |
+
+\*\* Sitting flat at 100 reflects a real methodology limit worth naming: the
+interest-to-category keyword map is broad enough (e.g. "sightseeing" maps to
+generic Places types like `point_of_interest`) that most attractions
+trivially match, so this metric currently has weak discriminative power.
+
+### RAG Retrieval: Semantic → Hybrid → Reranked
+
+20 manually labeled queries (ground truth = real ChromaDB corpus documents
+tagged with matching destination+category, not LLM-generated labels).
+Precision@5 at each stage of the retrieval pipeline:
+
+| Stage | Precision@5 |
+|---|---|
+| Semantic search only (baseline) | 0.89 |
+| + BM25 hybrid (RRF fusion, no rerank) | 0.89 |
+| + Cross-encoder reranking | 1.00 |
+
+Adding hybrid retrieval on its own didn't move the needle - Reciprocal Rank
+Fusion just re-orders two already-decent rankings without adding new
+judgment. The cross-encoder reranker is what closed the gap: it scores each
+(query, candidate) pair directly instead of aggregating rank positions, and
+that's what fixed cases like "temples in Bangkok," where the semantic-only
+baseline mixed in a Hanoi temple and an unrelated Bangkok nightlife bar.
+Ground truth here is coarse (destination+category match, not a strict top-5
+ranking), so a perfect reranked score reflects a well-separated corpus at
+that granularity, not that ranking within a category is fully solved.
+
 ## 🚀 Deployment
 
 ### Current Status
 
-This application is currently configured for **local development and demonstration**.
-### Future Deployment Plans
+Deployment artifacts are prepared and locally verified but **not yet live**:
+a `backend/Dockerfile` builds and runs cleanly (`docker build` + `docker run`
+tested locally, `/health` returns healthy with the RAG corpus loaded), and
+the frontend no longer hardcodes `localhost:8000` - it reads
+`VITE_API_BASE_URL`. See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full env
+var checklist and exact deploy commands. Going live requires account setup
+on Railway/Vercel and pasting in API keys, which are manual steps.
 
-The application is deployment-ready with configurations for:
-- **Frontend**: Vercel, Netlify, or GitHub Pages
-- **Backend**: Railway, Render, or AWS Lambda
+### Deployment Plan
 
-Deployment can be completed upon request for production use cases.
+- **Frontend**: Vercel (`frontend/vercel.json` prepared for SPA routing)
+- **Backend**: Railway, via the Dockerfile (`backend/railway.toml` prepared)
+- **ChromaDB persistence**: bundled into the backend image at build time
+  rather than a runtime volume - see `DEPLOYMENT.md` for why.
 
 ## 📈 Future Enhancements
 

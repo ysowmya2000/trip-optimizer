@@ -1,0 +1,1209 @@
+{
+  "total_cases": 44,
+  "cases_completed_without_error": 44,
+  "mean_time_slot_appropriateness": 97.4,
+  "mean_diversity_score": 57.7,
+  "mean_interest_match_rate": 100.0,
+  "per_case_results": [
+    {
+      "id": "BC001",
+      "destination": "Paris",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 2,
+          "garden": 1,
+          "restaurant": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC002",
+      "destination": "Paris",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "museum": 5,
+          "tourist_attraction": 5,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC003",
+      "destination": "Paris",
+      "time_slot_appropriateness": {
+        "score": 95.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          }
+        ]
+      },
+      "diversity": {
+        "score": 45.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "park": 2,
+          "museum": 5,
+          "tourist_attraction": 8,
+          "restaurant": 4,
+          "garden": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC004",
+      "destination": "Paris",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "museum": 5,
+          "tourist_attraction": 5,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC005",
+      "destination": "Tokyo",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 80.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 2,
+          "garden": 3
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC006",
+      "destination": "Tokyo",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 66.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "restaurant": 4,
+          "tourist_attraction": 5,
+          "museum": 2,
+          "park": 2,
+          "garden": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC007",
+      "destination": "Tokyo",
+      "time_slot_appropriateness": {
+        "score": 90.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Central Park",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 3
+          },
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          }
+        ]
+      },
+      "diversity": {
+        "score": 50.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "restaurant": 4,
+          "tourist_attraction": 7,
+          "museum": 2,
+          "park": 2,
+          "garden": 5
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC008",
+      "destination": "Tokyo",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 66.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "restaurant": 4,
+          "tourist_attraction": 5,
+          "museum": 2,
+          "park": 2,
+          "garden": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC009",
+      "destination": "Dubai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 1,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC010",
+      "destination": "Dubai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 7,
+          "museum": 2,
+          "garden": 4,
+          "restaurant": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC011",
+      "destination": "Dubai",
+      "time_slot_appropriateness": {
+        "score": 89.5,
+        "total_attractions": 19,
+        "mismatches": [
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          },
+          {
+            "attraction": "Panoramic Viewpoint",
+            "keyword_bucket": "evening",
+            "scheduled_clock_bucket": "morning",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 42.1,
+        "total_attractions": 19,
+        "category_counts": {
+          "restaurant": 1,
+          "tourist_attraction": 10,
+          "museum": 2,
+          "park": 1,
+          "garden": 5
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 19,
+        "matched": 19
+      }
+    },
+    {
+      "id": "BC012",
+      "destination": "Dubai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 7,
+          "museum": 2,
+          "garden": 4,
+          "restaurant": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC013",
+      "destination": "Barcelona",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 80.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 2,
+          "garden": 3
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC014",
+      "destination": "Barcelona",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "tourist_attraction": 4,
+          "garden": 4,
+          "museum": 1,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC015",
+      "destination": "Barcelona",
+      "time_slot_appropriateness": {
+        "score": 84.2,
+        "total_attractions": 19,
+        "mismatches": [
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 2
+          },
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 3
+          },
+          {
+            "attraction": "Panoramic Viewpoint",
+            "keyword_bucket": "evening",
+            "scheduled_clock_bucket": "morning",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 47.4,
+        "total_attractions": 19,
+        "category_counts": {
+          "restaurant": 4,
+          "tourist_attraction": 8,
+          "park": 2,
+          "museum": 1,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 19,
+        "matched": 19
+      }
+    },
+    {
+      "id": "BC016",
+      "destination": "Barcelona",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "tourist_attraction": 4,
+          "garden": 4,
+          "museum": 1,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC017",
+      "destination": "Rome",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 1,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC018",
+      "destination": "Rome",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 7,
+          "museum": 3,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC019",
+      "destination": "Rome",
+      "time_slot_appropriateness": {
+        "score": 95.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          }
+        ]
+      },
+      "diversity": {
+        "score": 45.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "restaurant": 3,
+          "tourist_attraction": 9,
+          "museum": 3,
+          "park": 1,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC020",
+      "destination": "Rome",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 7,
+          "museum": 3,
+          "garden": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC021",
+      "destination": "Prague",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "garden": 4,
+          "park": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC022",
+      "destination": "Prague",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "garden": 4,
+          "museum": 4,
+          "tourist_attraction": 6,
+          "park": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC023",
+      "destination": "Prague",
+      "time_slot_appropriateness": {
+        "score": 90.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          },
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 45.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "garden": 4,
+          "museum": 4,
+          "tourist_attraction": 6,
+          "park": 1,
+          "restaurant": 5
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC024",
+      "destination": "Prague",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "garden": 4,
+          "museum": 4,
+          "tourist_attraction": 6,
+          "park": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC025",
+      "destination": "Lisbon",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 1,
+          "garden": 2,
+          "restaurant": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC026",
+      "destination": "Lisbon",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 6,
+          "garden": 2,
+          "museum": 2,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC027",
+      "destination": "Lisbon",
+      "time_slot_appropriateness": {
+        "score": 90.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 3
+          },
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          }
+        ]
+      },
+      "diversity": {
+        "score": 45.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "restaurant": 6,
+          "tourist_attraction": 9,
+          "museum": 2,
+          "park": 1,
+          "garden": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC028",
+      "destination": "Lisbon",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 6,
+          "garden": 2,
+          "museum": 2,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC029",
+      "destination": "Bangkok",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 80.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 2,
+          "garden": 3
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC030",
+      "destination": "Bangkok",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "museum": 2,
+          "tourist_attraction": 5,
+          "garden": 5,
+          "restaurant": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC031",
+      "destination": "Bangkok",
+      "time_slot_appropriateness": {
+        "score": 84.2,
+        "total_attractions": 19,
+        "mismatches": [
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 3
+          },
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          },
+          {
+            "attraction": "Panoramic Viewpoint",
+            "keyword_bucket": "evening",
+            "scheduled_clock_bucket": "morning",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 52.6,
+        "total_attractions": 19,
+        "category_counts": {
+          "park": 2,
+          "museum": 2,
+          "tourist_attraction": 8,
+          "garden": 5,
+          "restaurant": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 19,
+        "matched": 19
+      }
+    },
+    {
+      "id": "BC032",
+      "destination": "Bangkok",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "museum": 2,
+          "tourist_attraction": 5,
+          "garden": 5,
+          "restaurant": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC033",
+      "destination": "Hanoi",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 80.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 2,
+          "garden": 3
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC034",
+      "destination": "Hanoi",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "tourist_attraction": 5,
+          "museum": 2,
+          "garden": 6
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC035",
+      "destination": "Hanoi",
+      "time_slot_appropriateness": {
+        "score": 90.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Botanical Garden",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 3
+          },
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          }
+        ]
+      },
+      "diversity": {
+        "score": 50.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "park": 2,
+          "tourist_attraction": 6,
+          "museum": 2,
+          "garden": 6,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC036",
+      "destination": "Hanoi",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 2,
+          "tourist_attraction": 5,
+          "museum": 2,
+          "garden": 6
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC037",
+      "destination": "Bali",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 60.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "park": 1,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC038",
+      "destination": "Bali",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 6,
+          "museum": 4,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC039",
+      "destination": "Bali",
+      "time_slot_appropriateness": {
+        "score": 89.5,
+        "total_attractions": 19,
+        "mismatches": [
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          },
+          {
+            "attraction": "Panoramic Viewpoint",
+            "keyword_bucket": "evening",
+            "scheduled_clock_bucket": "morning",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 36.8,
+        "total_attractions": 19,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 10,
+          "museum": 4,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 19,
+        "matched": 19
+      }
+    },
+    {
+      "id": "BC040",
+      "destination": "Bali",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 46.7,
+        "total_attractions": 15,
+        "category_counts": {
+          "park": 1,
+          "tourist_attraction": 6,
+          "museum": 4,
+          "restaurant": 4
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC041",
+      "destination": "Mumbai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 80.0,
+        "total_attractions": 5,
+        "category_counts": {
+          "garden": 3,
+          "park": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 5,
+        "matched": 5
+      }
+    },
+    {
+      "id": "BC042",
+      "destination": "Mumbai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "garden": 3,
+          "museum": 6,
+          "tourist_attraction": 4,
+          "park": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    },
+    {
+      "id": "BC043",
+      "destination": "Mumbai",
+      "time_slot_appropriateness": {
+        "score": 90.0,
+        "total_attractions": 20,
+        "mismatches": [
+          {
+            "attraction": "Local Street Food Market",
+            "keyword_bucket": "morning",
+            "scheduled_clock_bucket": "evening",
+            "day": 4
+          },
+          {
+            "attraction": "Skyline Rooftop Lounge",
+            "keyword_bucket": "night",
+            "scheduled_clock_bucket": "evening",
+            "day": 5
+          }
+        ]
+      },
+      "diversity": {
+        "score": 55.0,
+        "total_attractions": 20,
+        "category_counts": {
+          "garden": 3,
+          "museum": 6,
+          "tourist_attraction": 6,
+          "park": 2,
+          "restaurant": 2,
+          "bar": 1
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 20,
+        "matched": 20
+      }
+    },
+    {
+      "id": "BC044",
+      "destination": "Mumbai",
+      "time_slot_appropriateness": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "mismatches": []
+      },
+      "diversity": {
+        "score": 53.3,
+        "total_attractions": 15,
+        "category_counts": {
+          "garden": 3,
+          "museum": 6,
+          "tourist_attraction": 4,
+          "park": 2
+        }
+      },
+      "interest_match": {
+        "score": 100.0,
+        "total_attractions": 15,
+        "matched": 15
+      }
+    }
+  ]
+}

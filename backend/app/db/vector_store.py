@@ -76,11 +76,25 @@ class TravelKnowledgeBase:
             n_results=n_results,
             where=filter_metadata
         )
-        
+
         return {
+            "ids": results["ids"][0] if results.get("ids") else [],
             "documents": results["documents"][0] if results["documents"] else [],
             "metadatas": results["metadatas"][0] if results["metadatas"] else [],
             "distances": results["distances"][0] if results["distances"] else []
+        }
+
+    def get_all_documents(self, filter_metadata: Optional[Dict] = None) -> Dict:
+        """
+        Return the raw document corpus (ids/documents/metadatas), optionally
+        filtered by metadata (e.g. {"destination": "Bangkok"}). BM25 needs
+        the raw text directly rather than a similarity-ranked subset.
+        """
+        results = self.collection.get(where=filter_metadata, include=["documents", "metadatas"])
+        return {
+            "ids": results.get("ids", []),
+            "documents": results.get("documents", []),
+            "metadatas": results.get("metadatas", []),
         }
     
     def get_tips_for_destination(self, destination: str, n_results: int = 5) -> List[str]:

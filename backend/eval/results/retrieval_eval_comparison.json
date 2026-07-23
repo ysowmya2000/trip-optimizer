@@ -1,0 +1,13 @@
+{
+  "methodology_note": "Ground truth is coarse: every document seeded under a matching (destination, category) tag counts as correct (see retrieval_test_queries.py), not a strict top-5 ranking. A perfect reranked score reflects that the corpus is well-separated at the city+category level once the right candidates reach the reranking stage, not that ranking within a category is a solved problem.",
+  "semantic_only_baseline": {
+    "precision_at_5": 0.89
+  },
+  "hybrid_only": {
+    "precision_at_5": 0.89
+  },
+  "hybrid_plus_reranked": {
+    "precision_at_5": 1.0
+  },
+  "num_queries": 20
+}

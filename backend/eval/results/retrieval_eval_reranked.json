@@ -1,0 +1,266 @@
+{
+  "mode": "reranked",
+  "mean_precision_at_5": 1.0,
+  "per_query_results": [
+    {
+      "query": "temples in Bangkok",
+      "destination": "Bangkok",
+      "category": "temples",
+      "retrieved_ids": [
+        "attr_ChIJ5Wl37g6Z4jARiP4itarBPDQ",
+        "attr_ChIJA7PG9AuZ4jARIyvh-TR_wkA",
+        "attr_ChIJaSv_6gaZ4jARnbiUVn6Z_YY",
+        "attr_ChIJvccM01iZ4jARPwr8_uBuM_8",
+        "attr_ChIJ4VPDiQKZ4jARdfHoseVonFk"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "street food in Bangkok",
+      "destination": "Bangkok",
+      "category": "food",
+      "retrieved_ids": [
+        "attr_ChIJ89uLVgCf4jAR5AAlCha57tQ",
+        "attr_ChIJC2PZegCZ4jAR7tyqaMPS38s",
+        "attr_ChIJp5jKGQCZ4jAR4l0DCdvPrLo",
+        "attr_ChIJje_pHwCZ4jAR52gik_-LBT0",
+        "attr_ChIJhzewhWqZ4jARkjTpeifVZk8"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "nightlife in Bangkok",
+      "destination": "Bangkok",
+      "category": "nightlife",
+      "retrieved_ids": [
+        "attr_ChIJ6fTp2buf4jARfkwPiyFfOKs",
+        "attr_ChIJI1joEm2Z4jAR1RIdaTWebBQ",
+        "attr_ChIJBT9pW_aZ4jARnygIc5iuupE",
+        "attr_ChIJ0Sf6Yiyf4jARebisewq7E-4",
+        "attr_ChIJF0QAycSY4jARv3t4vwi1r8A"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "street food in Hanoi",
+      "destination": "Hanoi",
+      "category": "food",
+      "retrieved_ids": [
+        "attr_ChIJOWzaPxGrNTERlksVQI3wIzI",
+        "attr_ChIJJci6wKyrNTER59o2N4mdFY4",
+        "attr_ChIJf_4Ie7-rNTERqD8UU8HVyhA",
+        "attr_ChIJ_4KkypOrNTERConxQCyztMs",
+        "attr_ChIJUZwaffmrNTER3zljQzqBUOY"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "temples in Hanoi",
+      "destination": "Hanoi",
+      "category": "temples",
+      "retrieved_ids": [
+        "attr_ChIJMciE-GmrNTERfjkshGzwPNE",
+        "attr_ChIJ9Y3KR7-rNTERawQ7FeFv5gA",
+        "attr_ChIJp56AAMCrNTERHTeCAuwWJ7s",
+        "attr_ChIJwyFZi6WrNTER76sqY7OcMjE",
+        "attr_ChIJZ73nJpmrNTERHt_VdIgHDlg"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "nature parks in Prague",
+      "destination": "Prague",
+      "category": "nature",
+      "retrieved_ids": [
+        "attr_ChIJ4eTG7OSUC0cRXMru0PQo-Kk",
+        "attr_ChIJbSZndNuUC0cR2lgM9o_zW5Q",
+        "attr_ChIJ3UB98gKVC0cRwGV3D_tmxY4",
+        "attr_ChIJ936RN22VC0cR5aIolrcYls4",
+        "attr_ChIJ-53TmZqUC0cRiqnBgT93RXQ"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "nightlife in Prague",
+      "destination": "Prague",
+      "category": "nightlife",
+      "retrieved_ids": [
+        "attr_ChIJTRGoFbWUC0cRczZMAqrg0X8",
+        "attr_ChIJfWDMYuqUC0cRb7F2dVLFPQI",
+        "attr_ChIJh0E5jumUC0cR7bhXrpqrBl4",
+        "attr_ChIJV3BqjuWUC0cRYMoGwBtnyz4",
+        "attr_ChIJ4b6ugO6UC0cRKmnm1vbtoLc"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "nightlife in Paris",
+      "destination": "Paris",
+      "category": "nightlife",
+      "retrieved_ids": [
+        "attr_ChIJVYQc4ehv5kcRxAmY5t4c54k",
+        "attr_ChIJ88rPsBlu5kcREsV3u2lhALM",
+        "attr_ChIJw-i9w35v5kcR-EuieLb04jg",
+        "attr_ChIJ-xK88-1z5kcRHWabGDpij6Y",
+        "attr_ChIJM0zuNexv5kcRRO9O90zTvoA"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "museums in Paris",
+      "destination": "Paris",
+      "category": "museums",
+      "retrieved_ids": [
+        "attr_ChIJfRtS-QBu5kcRwRg5JXVrwcg",
+        "attr_ChIJD3uTd9hx5kcR1IQvGfr8dbk",
+        "attr_ChIJS2t0QgFu5kcR92388prakcE",
+        "attr_ChIJo6qq6i5u5kcRCpYBp4rQP9w",
+        "attr_ChIJLxPh9d1x5kcRf7M1U0pu1gU"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "museums in Rome",
+      "destination": "Rome",
+      "category": "museums",
+      "retrieved_ids": [
+        "attr_ChIJ18PTgaZhLxMRvINaLw9AZ2w",
+        "attr_ChIJ8-wGeU9gLxMR--zJtnpGod4",
+        "attr_ChIJPRgYblBgLxMRB--q_Tzt4wY",
+        "attr_ChIJxcyMIv1gLxMRKAH_Dv2q8iw",
+        "attr_ChIJlSkdkeRgLxMREkRxyk8IJEY"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "parks in Rome",
+      "destination": "Rome",
+      "category": "nature",
+      "retrieved_ids": [
+        "attr_ChIJ46sD-LlhLxMR0TuCx56rFYc",
+        "attr_ChIJj1M8HQJhLxMRRI6D_z18Pes",
+        "attr_ChIJCajXkAiKJRMREV4n39850EU",
+        "attr_ChIJBeoiURqKJRMRCVOXmu4EKqo",
+        "attr_ChIJYeUz0BpgLxMRBNr_z8ge-CA"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "markets in Mumbai",
+      "destination": "Mumbai",
+      "category": "markets",
+      "retrieved_ids": [
+        "attr_ChIJZ6fUhLjP5zsRHNZ5poAWy88",
+        "attr_ChIJJf1rhybO5zsRpArb-NaAh5o",
+        "attr_ChIJ__-jRTvO5zsR6iycCnFj2_Y",
+        "attr_ChIJn079zr_R5zsR3Ghy0UQ2dCM",
+        "attr_ChIJRcmQYUHP5zsRu8k34sDz00w"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "street food in Mumbai",
+      "destination": "Mumbai",
+      "category": "food",
+      "retrieved_ids": [
+        "attr_ChIJL0EwAI_O5zsRKTWGclEoGgA",
+        "attr_ChIJsYFP93jR5zsRcKWa8kY7-Ig",
+        "attr_ChIJOZdnQwfR5zsRBarhOYp355c",
+        "attr_ChIJOW5d0SLR5zsRdOb864OWRxg",
+        "attr_ChIJK7D_sczR5zsRph3XOWbNdfA"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "architecture in Barcelona",
+      "destination": "Barcelona",
+      "category": "architecture",
+      "retrieved_ids": [
+        "attr_ChIJHQufE_mipBIRXhKyv6uiJNY",
+        "attr_ChIJJ0AB4M-ipBIRj3HSiyLF-gE",
+        "attr_ChIJ1eGKmZOipBIRah43T2Kjn8Q",
+        "attr_ChIJYUFLSe2ipBIRD04uni940kA",
+        "attr_ChIJ160fSTajpBIRZlKRfkwTn1U"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "local food in Barcelona",
+      "destination": "Barcelona",
+      "category": "food",
+      "retrieved_ids": [
+        "attr_ChIJf8Zst1-jpBIRkov6YZvFOpY",
+        "attr_ChIJ1-Cye6OipBIRxpfgjCDejPk",
+        "attr_ChIJfzr5EfWipBIRbpBQmkaOrNI",
+        "attr_ChIJz7Jj3beipBIReQW92-l4bWk",
+        "attr_ChIJA_gqnRu9pBIRNpT3-5KeMZc"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "shopping in Tokyo",
+      "destination": "Tokyo",
+      "category": "shopping",
+      "retrieved_ids": [
+        "attr_ChIJP6jlUFiLGGAR5fwuswd1KXA",
+        "attr_ChIJj0CdfaSMGGAROHhLfxE208o",
+        "attr_ChIJr4J6pKmMGGARdQLOgrzToH4",
+        "attr_ChIJ_TibA9qMGGARNYmVIFyGU9k",
+        "attr_ChIJcyH-4qiMGGARGzk4lZCx2xo"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "rooftop bars in Dubai",
+      "destination": "Dubai",
+      "category": "nightlife",
+      "retrieved_ids": [
+        "attr_ChIJAd5eP65DXz4R59kt0aT4Vqs",
+        "attr_ChIJh2RqzN1DXz4RBXw--Qi_xCY",
+        "attr_ChIJWYnl2GVCXz4RJBRxguVWjNI",
+        "attr_ChIJ2wkf03ZDXz4RBbs1HOWlS1M",
+        "attr_ChIJtcrHqmRDXz4R5LhkoE7ibHU"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "historical sites in Dubai",
+      "destination": "Dubai",
+      "category": "historical",
+      "retrieved_ids": [
+        "attr_ChIJ____cw5CXz4RN2I0Y4Iwexs",
+        "attr_ChIJS-JnijRDXz4R4rfO4QLlRf8",
+        "attr_ChIJV_ZX__1pXz4RrY7C46fQmqI",
+        "attr_ChIJWQnUnqVCXz4RuFhIAP-PUGE",
+        "attr_ChIJQZ3ZINtCXz4RmFeoAa81MPk"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "viewpoints in Lisbon",
+      "destination": "Lisbon",
+      "category": "nature",
+      "retrieved_ids": [
+        "attr_ChIJ9x5tKAA1GQ0RgCwYXAaOkQI",
+        "attr_ChIJLZJmepk0GQ0RIHStkdNe7cI",
+        "attr_ChIJQzXGs5EzGQ0RAytgn6leEcM",
+        "attr_ChIJH1dSp9tSzpQROFvFiXlCrdw",
+        "attr_ChIJeXctVnIzGQ0RNfNVqdSTjO4"
+      ],
+      "precision_at_5": 1.0
+    },
+    {
+      "query": "food in Lisbon",
+      "destination": "Lisbon",
+      "category": "food",
+      "retrieved_ids": [
+        "attr_ChIJQ68wysA1GQ0Ruvjt8Qn31MM",
+        "attr_ChIJkZDZjXY0GQ0R-4fI-zFNv0I",
+        "attr_ChIJdWBeWYc0GQ0RktxySU7hjxM",
+        "attr_ChIJtx4y4YkzGQ0RJADhVgp16xc",
+        "attr_ChIJfdVbOHc0GQ0Rf-x1kKZ2QAE"
+      ],
+      "precision_at_5": 1.0
+    }
+  ]
+}

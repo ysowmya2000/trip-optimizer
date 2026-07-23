@@ -6,6 +6,7 @@ from typing import List, Dict
 from app.external.google_places import google_places_client
 from app.db.vector_store import travel_kb
 from app.external.llm import llm_smart
+from app.retrieval.hybrid_retriever import hybrid_search
 
 
 class ResearchAgent:
@@ -133,18 +134,17 @@ class ResearchAgent:
         return report
     
     def _get_local_knowledge(self, destination: str, interests: List[str]) -> List[str]:
-        """Query RAG vector store for local knowledge"""
+        """Query RAG (hybrid retrieval + reranking) for local knowledge"""
         try:
             query = f"insider tips for {destination} related to {', '.join(interests)}"
-            results = self.vector_store.query(query_text=query, n_results=3)
-            
+            candidates = hybrid_search(query, top_k=20, rerank=True, final_k=3)
+
             tips = []
-            if results and 'documents' in results:
-                for doc_list in results['documents']:
-                    for doc in doc_list:
-                        if doc and len(doc) > 20:
-                            tips.append(doc)
-            
+            for c in candidates:
+                doc = c.get('document')
+                if doc and len(doc) > 20:
+                    tips.append(doc)
+
             return tips[:3]
         except:
             return []
@@ -221,16 +221,18 @@ Return ONLY the queries, one per line, no numbering."""
             
             try:
                 tips_query = f"tips for visiting {name} in {destination}"
-                tips_results = self.vector_store.query(query_text=tips_query, n_results=1)
-                
+                # smaller candidate pool here - this runs once per attraction
+                # (up to ~75/trip) as supplementary enrichment, not primary
+                # attraction selection, so keep the reranker's workload light
+                candidates = hybrid_search(tips_query, top_k=10, rerank=True, final_k=1)
+
                 rag_tip = None
-                if tips_results and 'documents' in tips_results:
-                    for doc_list in tips_results['documents']:
-                        for doc in doc_list:
-                            if doc and name.lower() in doc.lower():
-                                rag_tip = doc[:200]
-                                break
-                
+                for c in candidates:
+                    doc = c.get('document')
+                    if doc and name.lower() in doc.lower():
+                        rag_tip = doc[:200]
+                        break
+
                 attr_copy = attr.copy()
                 if rag_tip:
                     attr_copy['rag_tip'] = rag_tip
