@@ -535,6 +535,14 @@ Ground truth here is coarse (destination+category match, not a strict top-5
 ranking), so a perfect reranked score reflects a well-separated corpus at
 that granularity, not that ranking within a category is fully solved.
 
+**Note on the live deployment:** the numbers above measure the full
+hybrid+reranked pipeline as implemented. The deployed instance runs with
+reranking disabled (`ENABLE_RERANKING=false`) because the reranker's
+PyTorch dependency pushed the container over Render's free-tier memory
+limit - see `DEPLOYMENT.md` for the full investigation. The live demo
+therefore reflects hybrid retrieval without reranking (0.89 precision@5),
+not the 1.00 figure above.
+
 ## 🚀 Deployment
 
 ### Current Status

@@ -63,6 +63,39 @@ after ~15 minutes of inactivity and cold-start (30s-1min) on the next
 request. Fine for a demo/portfolio link, not for anything needing instant
 response after idle time.
 
+**Reranking is disabled in this deployment (`ENABLE_RERANKING=false` in
+render.yaml) - here's why, and what it costs.** A real trip request
+OOM-killed the live container. Reproduced locally with
+`docker run --memory=512m`: an unconstrained run peaked at ~540MB, just
+over Render free tier's ~512MB ceiling. Tried two code-level fixes first
+(pre-warming both ML models into the image at build time instead of
+downloading on first request; switching the cross-encoder to a quantized
+ONNX Runtime backend instead of full PyTorch) - neither got it under the
+cap, because `sentence-transformers` imports full PyTorch as a side effect
+of the package import itself, regardless of which backend actually runs
+inference. `torch` + `transformers` + `onnxruntime` + `chromadb` + `fastapi`
+all resident in one process is fundamentally too heavy for 512MB,
+independent of model choice.
+
+The reranker's import is lazy (`app/retrieval/reranker.py` only imports
+`sentence_transformers` inside `_get_model()`, called only when reranking
+actually runs), so `ENABLE_RERANKING=false`
+(`app/core/config.py`/`app/retrieval/hybrid_retriever.py`) skips that call
+entirely and torch never loads. Verified locally under the same 512MB cap:
+peak memory dropped to ~224MB and a real trip request returned 200 in under
+a second.
+
+**What this costs**: the live deployment runs hybrid retrieval (BM25 +
+semantic, RRF-fused) without the reranking stage, so retrieval quality
+reverts to the semantic-only baseline level (0.89 precision@5, per
+`backend/eval/results/`) rather than the 1.00 the full hybrid+reranked
+pipeline achieves - see the README's Evaluation Results section. The full
+pipeline still exists in code and is what the eval numbers measure; it's
+just not what's running in this specific free-tier deployment. Re-enable
+by removing/flipping `ENABLE_RERANKING` on a plan with more memory
+(Render's paid tiers start around $7/mo for 512MB→more RAM - real cost,
+not something to switch on without checking first).
+
 ## Frontend (Netlify)
 
 **Prepared:**

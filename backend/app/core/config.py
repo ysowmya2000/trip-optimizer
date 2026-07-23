@@ -23,9 +23,18 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str = "sqlite:///./tripoptimizer.db"
-    
+
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
+
+    # Cross-encoder reranking pulls in sentence-transformers, which imports
+    # full PyTorch as a side effect regardless of inference backend. That's
+    # enough on its own to exceed a 512MB container (measured: OOM-killed
+    # under docker run --memory=512m even with no other traffic). The import
+    # is lazy (only happens if reranking actually runs), so this flag lets a
+    # memory-constrained deployment skip it entirely and fall back to hybrid
+    # (BM25+semantic) retrieval without reranking.
+    ENABLE_RERANKING: bool = True
     
     class Config:
         env_file = ".env"

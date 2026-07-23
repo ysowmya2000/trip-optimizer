@@ -5,6 +5,7 @@ then optionally reranks the fused candidates with a cross-encoder.
 """
 from typing import Dict, List
 
+from app.core.config import settings
 from app.db.vector_store import travel_kb
 from app.retrieval.bm25_retriever import bm25_retriever
 
@@ -49,7 +50,7 @@ def hybrid_search(query: str, top_k: int = 20, rerank: bool = True, final_k: int
         for doc_id in fused_ids if doc_id in by_id
     ]
 
-    if rerank and candidates:
+    if rerank and candidates and settings.ENABLE_RERANKING:
         from app.retrieval.reranker import rerank_candidates
         candidates = rerank_candidates(query, candidates)
 
