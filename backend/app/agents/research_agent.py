@@ -136,15 +136,13 @@ class ResearchAgent:
         """Query RAG vector store for local knowledge"""
         try:
             query = f"insider tips for {destination} related to {', '.join(interests)}"
-            results = self.vector_store.query(query_text=query, n_results=3)
-            
+            results = self.vector_store.search(query=query, n_results=3)
+
             tips = []
-            if results and 'documents' in results:
-                for doc_list in results['documents']:
-                    for doc in doc_list:
-                        if doc and len(doc) > 20:
-                            tips.append(doc)
-            
+            for doc in results.get('documents', []):
+                if doc and len(doc) > 20:
+                    tips.append(doc)
+
             return tips[:3]
         except:
             return []
@@ -221,16 +219,14 @@ Return ONLY the queries, one per line, no numbering."""
             
             try:
                 tips_query = f"tips for visiting {name} in {destination}"
-                tips_results = self.vector_store.query(query_text=tips_query, n_results=1)
-                
+                tips_results = self.vector_store.search(query=tips_query, n_results=1)
+
                 rag_tip = None
-                if tips_results and 'documents' in tips_results:
-                    for doc_list in tips_results['documents']:
-                        for doc in doc_list:
-                            if doc and name.lower() in doc.lower():
-                                rag_tip = doc[:200]
-                                break
-                
+                for doc in tips_results.get('documents', []):
+                    if doc and name.lower() in doc.lower():
+                        rag_tip = doc[:200]
+                        break
+
                 attr_copy = attr.copy()
                 if rag_tip:
                     attr_copy['rag_tip'] = rag_tip
