@@ -79,15 +79,21 @@ class GooglePlacesClient:
             print(f"❌ Error searching Google Places: {e}")
             return self._get_mock_data(location, query)
     
+    # Names deliberately don't embed {location} - planning_agent's time-slot
+    # categorization does substring keyword matching (e.g. NIGHT_KEYWORDS
+    # includes 'bar'), and a city name can accidentally collide with a
+    # keyword (e.g. "Barcelona" contains "bar"), misclassifying every mock
+    # attraction for that city as nightlife. Location still appears in the
+    # address, matching how a real Places `vicinity` field would look.
     MOCK_TEMPLATES = [
-        ('Grand Temple of {location}', ['tourist_attraction', 'place_of_worship', 'point_of_interest'], 4.6),
-        ('{location} History Museum', ['museum', 'point_of_interest'], 4.5),
-        ('{location} Street Food Market', ['restaurant', 'food', 'point_of_interest'], 4.4),
-        ('{location} Central Park', ['park', 'tourist_attraction', 'point_of_interest'], 4.3),
-        ('{location} Skyline Rooftop Bar', ['bar', 'nightlife', 'point_of_interest'], 4.2),
-        ('{location} Panoramic Viewpoint', ['tourist_attraction', 'viewpoint', 'point_of_interest'], 4.7),
-        ('{location} Old Town Square', ['tourist_attraction', 'point_of_interest'], 4.1),
-        ('{location} Botanical Garden', ['garden', 'park', 'point_of_interest'], 4.5),
+        ('Grand Temple', ['tourist_attraction', 'place_of_worship', 'point_of_interest'], 4.6),
+        ('City History Museum', ['museum', 'point_of_interest'], 4.5),
+        ('Local Street Food Market', ['restaurant', 'food', 'point_of_interest'], 4.4),
+        ('Central Park', ['park', 'tourist_attraction', 'point_of_interest'], 4.3),
+        ('Skyline Rooftop Lounge', ['bar', 'nightlife', 'point_of_interest'], 4.2),
+        ('Panoramic Viewpoint', ['tourist_attraction', 'viewpoint', 'point_of_interest'], 4.7),
+        ('Old Town Square', ['tourist_attraction', 'point_of_interest'], 4.1),
+        ('Botanical Garden', ['garden', 'park', 'point_of_interest'], 4.5),
     ]
 
     def _get_mock_data(self, location: str, query: str) -> List[Dict]:
@@ -105,7 +111,7 @@ class GooglePlacesClient:
             if int(seed[i], 16) % 2 == 0:
                 continue
             results.append({
-                'name': name_tpl.format(location=location),
+                'name': name_tpl,
                 'address': f'{100 + i} Sample Street, {location}',
                 'rating': rating,
                 'user_ratings_total': 500 + i * 137,
@@ -118,7 +124,7 @@ class GooglePlacesClient:
 
         if not results:
             results.append({
-                'name': f'Popular Attraction in {location}',
+                'name': 'Popular Attraction',
                 'address': f'123 Main Street, {location}',
                 'rating': 4.5,
                 'user_ratings_total': 1234,
