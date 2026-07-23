@@ -119,10 +119,53 @@ netlify deploy --prod
 Netlify assigns a URL like `https://<site-name>.netlify.app` - find it in
 the CLI output after `--prod`, or in the Netlify dashboard.
 
-## After both are live
+## What actually happened when both went live
 
-1. Open the Netlify URL, submit a real trip request, confirm it reaches the
-   Render backend and returns an itinerary (allow for the cold-start delay
-   if the backend has been idle).
-2. Update this repo's README: add the live demo URL at the top, replace
-   "configured for local development" in the Current Status section.
+Both deployed successfully - backend served `/health` from a public Render
+URL, frontend served the built app from Netlify with that URL baked in as
+`VITE_API_BASE_URL`. A real end-to-end trip submission was tested through
+the deployed frontend into the deployed backend.
+
+Two real problems surfaced in that order, each investigated and either
+fixed or documented rather than silently worked around:
+
+**1. OOM crash (fixed).** The first real trip request crashed the backend
+- `/health` went to 502, then recovered ~15s later (classic OOM-kill-then-
+restart). Reproduced locally with `docker run --memory=512m`: an
+unconstrained run peaked at ~540MB, just over Render free tier's ~512MB
+ceiling. Two code-level fixes were tried first (pre-warming both ML models
+into the image at build time; switching the cross-encoder to a quantized
+ONNX Runtime backend) - neither worked, because `sentence-transformers`
+imports full PyTorch as a side effect of the package import itself,
+regardless of which backend actually runs inference. Fixed by adding
+`ENABLE_RERANKING` (`app/core/config.py`), set to `false` in `render.yaml`
+- the reranker's import is already lazy, so this skips it (and therefore
+skips loading torch at all) rather than trying to shrink an unavoidable
+footprint. Verified locally under the same 512MB cap: peak memory dropped
+to ~224MB.
+
+**2. Request timeout (not fixed, documented as a known limitation).** With
+the OOM fixed, a real trip request still failed - this time a clean 502
+after ~45-50s regardless of client-side timeout settings (tested up to
+150s), meaning Render's free-tier proxy itself enforces that ceiling. The
+same request completes in ~7s locally against *mocked* Places data. The
+real bottleneck: `research_agent.py` makes roughly 7-10 sequential
+(not parallel) real Google Places API calls per trip (multiple landmark
+searches, then interest-based searches), each a genuine network round
+trip from Render's servers to Google's API. This was never exposed before
+because all prior testing in this project used mocked Places data (see
+`eval/_mock_places.py` and the "no paid Places calls" project memory).
+Fixing this properly means parallelizing those calls (e.g.
+`asyncio.gather`), which changes Research Agent orchestration flow - out
+of scope for this work's "don't modify agent orchestration logic"
+constraint, so it's left as a known limitation rather than fixed without
+checking first.
+
+**Decision: not keeping this live as a public demo.** The app's primary
+supported way to run is locally (frontend + backend, browser hitting
+`localhost:8000`), which works fully and was the basis for all the eval
+harness and hybrid-retrieval verification in this project. The deployed
+infrastructure is real and was verified to build/start/serve correctly;
+picking this back up later just means addressing the sequential-API-calls
+timeout (or moving to a platform with a longer/configurable proxy
+timeout).

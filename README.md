@@ -547,21 +547,49 @@ not the 1.00 figure above.
 
 ### Current Status
 
-Deployment artifacts are prepared and locally verified but **not yet live**:
-a `backend/Dockerfile` builds and runs cleanly (`docker build` + `docker run`
-tested locally, `/health` returns healthy with the RAG corpus loaded), and
-the frontend no longer hardcodes `localhost:8000` - it reads
-`VITE_API_BASE_URL`. See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full env
-var checklist and exact deploy commands. Going live requires account setup
-on Render/Netlify and pasting in API keys, which are manual steps.
+The app runs fully locally (frontend + backend, browser hitting
+`localhost:8000`) - that's the primary supported way to use it. Deployment
+artifacts exist and were pushed to real infrastructure (Render backend,
+Netlify frontend) to validate they work, but the project is **not being
+kept live** as a public demo. Here's what was actually verified and why it
+stopped there, documented rather than left as a vague "deployment-ready"
+claim:
 
-### Deployment Plan
+- `backend/Dockerfile` builds and runs cleanly, including under a
+  `docker run --memory=512m` constraint matching Render's free tier
+  (`/health` returns healthy, ~93MB baseline).
+- Backend actually deployed to Render from `render.yaml` and served
+  `/health` successfully at a public URL.
+- Frontend actually deployed to Netlify with the live backend URL baked
+  into the build (`VITE_API_BASE_URL`), and a real end-to-end trip
+  submission was tested through the deployed frontend into the deployed
+  backend.
+- **What didn't work**: real trip requests against the live backend
+  consistently timed out. Render's free-tier proxy enforces a hard
+  ~45-50s request timeout; the same request completes in ~7s locally with
+  mocked Places data, so the bottleneck is specifically the cumulative
+  latency of `research_agent.py`'s ~7-10 *sequential* real Google Places
+  API calls plus Groq calls - not something masked before since prior
+  testing used mocked Places data (see the "no paid Places calls" note in
+  Phase 0). Fixing this properly means parallelizing those calls, which
+  changes Research Agent orchestration flow - out of scope per the
+  "don't modify agent orchestration logic" constraint on this work, so
+  it's documented as a known limitation rather than worked around.
 
-- **Frontend**: Netlify (`frontend/netlify.toml` prepared for build + SPA routing)
-- **Backend**: Render, via the Dockerfile (`render.yaml` Blueprint prepared)
+See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full investigation
+(including a real OOM crash that was fixed first) and the exact steps if
+someone wants to pick this back up.
+
+### Deployment Plan (as prepared)
+
+- **Frontend**: Netlify (`frontend/netlify.toml`)
+- **Backend**: Render, via the Dockerfile (`render.yaml` Blueprint)
 - **ChromaDB persistence**: bundled into the backend image at build time
   rather than a runtime disk (Render's free plan doesn't include one) -
   see `DEPLOYMENT.md` for why.
+- **Reranking**: disabled in the deployed backend (`ENABLE_RERANKING=false`)
+  after a real OOM crash - see `DEPLOYMENT.md` and the Evaluation Results
+  note above.
 
 Originally targeted Railway + Vercel per the spec; switched to Render +
 Netlify after both hit expired free-trial billing during setup.
