@@ -46,10 +46,15 @@ def run_mode(mode: str) -> dict:
         retrieve_fn = get_semantic_ids
     elif mode == "hybrid":
         from app.retrieval.hybrid_retriever import hybrid_search_ids
-        retrieve_fn = lambda q, n_results=5: hybrid_search_ids(q, top_k=n_results, rerank=False)
+        # top_k=20 is the fusion candidate pool size (cast a wide net);
+        # final_k=n_results is what actually gets scored for precision@5.
+        # Passing n_results as top_k here was a bug - it capped the RRF
+        # fusion pool at 5 candidates per retriever instead of 20, which
+        # defeats the point of hybrid retrieval before reranking even runs.
+        retrieve_fn = lambda q, n_results=5: hybrid_search_ids(q, top_k=20, rerank=False, final_k=n_results)
     elif mode == "reranked":
         from app.retrieval.hybrid_retriever import hybrid_search_ids
-        retrieve_fn = lambda q, n_results=5: hybrid_search_ids(q, top_k=n_results, rerank=True)
+        retrieve_fn = lambda q, n_results=5: hybrid_search_ids(q, top_k=20, rerank=True, final_k=n_results)
     else:
         raise ValueError(f"unknown mode: {mode}")
 
