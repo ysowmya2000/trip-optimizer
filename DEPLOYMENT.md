@@ -1,34 +1,40 @@
 # Deployment
 
-Backend deploys to Railway (Dockerfile), frontend to Vercel. This doc covers
+Backend deploys to Render (Dockerfile), frontend to Netlify. This doc covers
 what's already prepared in the repo and the exact steps left for you to run
 - account login, secrets, and the actual deploy trigger aren't something run
 on your behalf here.
 
-## Backend (Railway)
+(Originally targeted Railway + Vercel, per the spec's "Railway or Render" /
+Vercel options - switched after both of those hit expired free-trial
+billing during setup. Render + Netlify don't require a paid trial to start.)
+
+## Backend (Render)
 
 **Prepared:**
 - `backend/Dockerfile` - builds and runs the FastAPI app. Verified locally
   with `docker build` + `docker run`: starts cleanly, `/health` returns
   `{"status":"healthy","agents_active":5,"rag_enabled":true}`.
-- `backend/railway.toml` - points Railway at the Dockerfile build, sets a
-  health check against `/health`.
+- `render.yaml` (repo root) - a Render "Blueprint" that points at the
+  Dockerfile, sets the free plan, and declares the env vars below as
+  `sync: false` (meaning Render will prompt you to fill them in rather than
+  expecting a value in the file - so no secrets live in git).
 
 **ChromaDB persistence - the decision this needed, made explicit:** the
 `travel_knowledge` corpus (`backend/data/chroma`) is copied into the image
 at build time (`COPY data ./data` in the Dockerfile), not left to a runtime
-volume. Two reasons: Railway's free tier doesn't guarantee a persistent
-volume across redeploys unless you explicitly attach one, and re-seeding the
-corpus needs live Google Places API calls, which aren't being made right now
-(expired credits). Bundling at build time means the corpus is always present
-regardless of volume support - the tradeoff is that any *future* corpus
-update requires a rebuild+redeploy, not just a running-container write. If
-you later want live updates without redeploying, attach a Railway volume
-mounted at `/app/data/chroma` instead and drop the `COPY data` line - that's
-the stronger option, just not the one bundled today given the constraint.
+volume/disk. Render's free web service plan doesn't include a persistent
+disk at all (that's a paid-plan feature), and re-seeding the corpus needs
+live Google Places API calls, which aren't being made right now (expired
+credits). Bundling at build time sidesteps both constraints - the tradeoff
+is that any *future* corpus update requires a rebuild+redeploy, not just a
+running-container write. If you later upgrade to a paid Render plan and want
+live updates without redeploying, attach a persistent disk mounted at
+`/app/data/chroma` instead and drop the `COPY data` line.
 
-**Env vars to set in the Railway dashboard** (Settings -> Variables), exact
-names from `backend/app/core/config.py`:
+**Env vars to set** (Render will prompt for these on first deploy from the
+Blueprint, or set them under the service's Environment tab), exact names
+from `backend/app/core/config.py`:
 
 | Variable | Required | Notes |
 |---|---|---|
@@ -36,26 +42,33 @@ names from `backend/app/core/config.py`:
 | `GOOGLE_PLACES_API_KEY` | Yes | Live attraction search. Falls back to mock data if unset/invalid. |
 | `GOOGLE_DIRECTIONS_API_KEY` | Optional | Not `GOOGLE_MAPS_API_KEY` - that's what the spec said, but the actual code reads this name |
 | `OPENWEATHER_API_KEY` | Optional | Weather agent has a seasonal-forecast fallback |
-| `SECRET_KEY` | Recommended | Defaults to a placeholder string, set a real one |
+| `SECRET_KEY` | Auto-generated | `render.yaml` sets `generateValue: true`, Render creates one |
 | `DATABASE_URL`, `REDIS_URL` | No | Declared in config.py with working defaults; nothing in the current agent code actually connects to a real DB/Redis instance |
 
-**Steps (yours to run):**
-```bash
-npm install -g @railway/cli
-railway login                    # opens a browser auth flow
-cd backend
-railway init                     # or `railway link` if a project already exists
-railway up                       # builds from the Dockerfile and deploys
-railway variables set GROQ_API_KEY=... GOOGLE_PLACES_API_KEY=...
-```
-Railway assigns a public URL after the first deploy - find it under the
-service's "Settings -> Networking" or `railway domain`.
+**Steps (yours to run - Render deploys via GitHub connection + dashboard,
+there's no CLI push flow like Railway's):**
+1. Go to [dashboard.render.com](https://dashboard.render.com) and sign in
+   (or create an account - free, no trial/card required for the free plan).
+2. **New +** -> **Blueprint** -> connect the `ysowmya2000/trip-optimizer`
+   GitHub repo. Render reads `render.yaml` automatically and proposes the
+   `trip-optimizer-backend` service.
+3. Fill in `GROQ_API_KEY` and `GOOGLE_PLACES_API_KEY` when prompted (the
+   other two are optional, leave blank to skip).
+4. Deploy. First build takes a few minutes (installs `torch`,
+   `sentence-transformers`, etc.). Render assigns a public URL like
+   `https://trip-optimizer-backend.onrender.com`.
 
-## Frontend (Vercel)
+**Free-tier tradeoff to know about:** Render's free web services spin down
+after ~15 minutes of inactivity and cold-start (30s-1min) on the next
+request. Fine for a demo/portfolio link, not for anything needing instant
+response after idle time.
+
+## Frontend (Netlify)
 
 **Prepared:**
-- `frontend/vercel.json` - SPA rewrite so client-side routes (react-router-dom)
-  don't 404 on refresh.
+- `frontend/netlify.toml` - build command, publish directory, and an SPA
+  redirect rule so client-side routes (react-router-dom) don't 404 on
+  refresh.
 - `frontend/.env.example` - documents `VITE_API_BASE_URL`.
 - `frontend/src/pages/Home.jsx` now reads `import.meta.env.VITE_API_BASE_URL`
   instead of a hardcoded `http://localhost:8000`, falling back to localhost
@@ -63,17 +76,20 @@ service's "Settings -> Networking" or `railway domain`.
 
 **Steps (yours to run):**
 ```bash
-npm install -g vercel
+npm install -g netlify-cli    # already installed in this environment
 cd frontend
-vercel login
-vercel                           # first run links/creates the project
-vercel env add VITE_API_BASE_URL production   # paste the Railway backend URL
-vercel --prod
+netlify login                 # opens a browser auth flow
+netlify init                  # links/creates the site, reads netlify.toml
+netlify env:set VITE_API_BASE_URL https://trip-optimizer-backend.onrender.com
+netlify deploy --prod
 ```
+Netlify assigns a URL like `https://<site-name>.netlify.app` - find it in
+the CLI output after `--prod`, or in the Netlify dashboard.
 
 ## After both are live
 
-1. Open the Vercel URL, submit a real trip request, confirm it reaches the
-   Railway backend and returns an itinerary.
+1. Open the Netlify URL, submit a real trip request, confirm it reaches the
+   Render backend and returns an itinerary (allow for the cold-start delay
+   if the backend has been idle).
 2. Update this repo's README: add the live demo URL at the top, replace
    "configured for local development" in the Current Status section.

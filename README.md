@@ -140,7 +140,7 @@ TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
 ### Infrastructure
 - **Vector DB**: ChromaDB (local persistent storage)
 - **Algorithms**: TSP optimization, Haversine distance
-- **Deployment**: Vercel (frontend) + Railway (backend)
+- **Deployment**: Netlify (frontend) + Render (backend)
 
 ## 🚀 Getting Started
 
@@ -545,14 +545,18 @@ tested locally, `/health` returns healthy with the RAG corpus loaded), and
 the frontend no longer hardcodes `localhost:8000` - it reads
 `VITE_API_BASE_URL`. See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full env
 var checklist and exact deploy commands. Going live requires account setup
-on Railway/Vercel and pasting in API keys, which are manual steps.
+on Render/Netlify and pasting in API keys, which are manual steps.
 
 ### Deployment Plan
 
-- **Frontend**: Vercel (`frontend/vercel.json` prepared for SPA routing)
-- **Backend**: Railway, via the Dockerfile (`backend/railway.toml` prepared)
+- **Frontend**: Netlify (`frontend/netlify.toml` prepared for build + SPA routing)
+- **Backend**: Render, via the Dockerfile (`render.yaml` Blueprint prepared)
 - **ChromaDB persistence**: bundled into the backend image at build time
-  rather than a runtime volume - see `DEPLOYMENT.md` for why.
+  rather than a runtime disk (Render's free plan doesn't include one) -
+  see `DEPLOYMENT.md` for why.
+
+Originally targeted Railway + Vercel per the spec; switched to Render +
+Netlify after both hit expired free-trial billing during setup.
 
 ## 📈 Future Enhancements
 
