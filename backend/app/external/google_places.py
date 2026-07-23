@@ -79,43 +79,57 @@ class GooglePlacesClient:
             print(f"❌ Error searching Google Places: {e}")
             return self._get_mock_data(location, query)
     
+    MOCK_TEMPLATES = [
+        ('Grand Temple of {location}', ['tourist_attraction', 'place_of_worship', 'point_of_interest'], 4.6),
+        ('{location} History Museum', ['museum', 'point_of_interest'], 4.5),
+        ('{location} Street Food Market', ['restaurant', 'food', 'point_of_interest'], 4.4),
+        ('{location} Central Park', ['park', 'tourist_attraction', 'point_of_interest'], 4.3),
+        ('{location} Skyline Rooftop Bar', ['bar', 'nightlife', 'point_of_interest'], 4.2),
+        ('{location} Panoramic Viewpoint', ['tourist_attraction', 'viewpoint', 'point_of_interest'], 4.7),
+        ('{location} Old Town Square', ['tourist_attraction', 'point_of_interest'], 4.1),
+        ('{location} Botanical Garden', ['garden', 'park', 'point_of_interest'], 4.5),
+    ]
+
     def _get_mock_data(self, location: str, query: str) -> List[Dict]:
-        """Return mock data for testing without API key."""
-        return [
-            {
+        """Return mock data for testing without an API key or live calls disabled.
+
+        place_id/name vary by (location, query) so repeated searches across a
+        research pass don't collapse to the same 3 items via place_id dedup -
+        mirroring how a real API returns different results per query.
+        """
+        import hashlib
+        seed = hashlib.md5(f"{location}_{query}".encode()).hexdigest()
+
+        results = []
+        for i, (name_tpl, types, rating) in enumerate(self.MOCK_TEMPLATES):
+            if int(seed[i], 16) % 2 == 0:
+                continue
+            results.append({
+                'name': name_tpl.format(location=location),
+                'address': f'{100 + i} Sample Street, {location}',
+                'rating': rating,
+                'user_ratings_total': 500 + i * 137,
+                'types': types,
+                'location': {'lat': 0.0, 'lng': 0.0},
+                'place_id': f'mock_{seed[:10]}_{i}',
+                'price_level': i % 4,
+                'opening_hours': {'open_now': True}
+            })
+
+        if not results:
+            results.append({
                 'name': f'Popular Attraction in {location}',
                 'address': f'123 Main Street, {location}',
                 'rating': 4.5,
                 'user_ratings_total': 1234,
                 'types': ['tourist_attraction', 'point_of_interest'],
-                'location': {'lat': 35.6762, 'lng': 139.6503},
-                'place_id': 'mock_place_1',
+                'location': {'lat': 0.0, 'lng': 0.0},
+                'place_id': f'mock_{seed[:10]}_fallback',
                 'price_level': 2,
                 'opening_hours': {'open_now': True}
-            },
-            {
-                'name': f'Historic Site in {location}',
-                'address': f'456 Park Avenue, {location}',
-                'rating': 4.8,
-                'user_ratings_total': 5678,
-                'types': ['museum', 'point_of_interest'],
-                'location': {'lat': 35.6895, 'lng': 139.6917},
-                'place_id': 'mock_place_2',
-                'price_level': 1,
-                'opening_hours': {'open_now': True}
-            },
-            {
-                'name': f'Top Restaurant in {location}',
-                'address': f'789 Food Street, {location}',
-                'rating': 4.7,
-                'user_ratings_total': 3456,
-                'types': ['restaurant', 'food'],
-                'location': {'lat': 35.6950, 'lng': 139.7010},
-                'place_id': 'mock_place_3',
-                'price_level': 2,
-                'opening_hours': {'open_now': True}
-            }
-        ]
+            })
+
+        return results
 
 
 # Create global instance
