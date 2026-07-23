@@ -1,113 +1,97 @@
-# 🌍 TripOptimizer - AI-Powered Budget-Aware Travel Planner
+# TripOptimizer — AI-Powered Budget-Aware Travel Planner
 
-An intelligent multi-agent system that creates personalized, budget-optimized travel itineraries using RAG (Retrieval-Augmented Generation), Google Places API, and advanced AI orchestration.
+A multi-agent system that builds personalized, budget-optimized travel itineraries using retrieval-augmented generation, live attraction data, and multi-agent orchestration.
 
-[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-green.svg)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB.svg)](https://react.dev/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🎯 Overview
+## Overview
 
-TripOptimizer is a sophisticated AI travel planning system that creates optimal itineraries based on your budget, interests, and travel dates. Unlike generic trip planners, it intelligently adjusts the number of attractions per day based on your budget and destination cost of living.
+TripOptimizer builds itineraries based on budget, interests, and travel dates, adjusting the number of attractions per day to both the user's budget and the destination's cost of living — rather than returning the same fixed itinerary regardless of what a trip actually costs to run.
 
 ### Key Features
 
-- **💰 Budget-Aware Planning**: Automatically adjusts attractions (1-5 per day) based on your budget
-- **🌍 City Cost Intelligence**: Knows the cost of living in 90+ cities worldwide
-- **💱 Multi-Currency Support**: Works with 49+ currencies with real-time conversion
-- **📅 Seasonal Weather**: Provides season-specific packing advice for travel dates
-- **🗺️ Route Optimization**: Uses TSP algorithm to minimize travel time between attractions
-- **🎨 Smart Scheduling**: Places attractions at optimal times (morning gardens, evening viewpoints)
-- **✅ Budget Validation**: Rejects trips with insufficient budget and suggests minimum required
+- **Budget-aware planning**: adjusts attractions (1–5/day) to the user's budget
+- **City cost intelligence**: cost-of-living multipliers for 90+ cities
+- **Multi-currency support**: 49 currencies with conversion
+- **Seasonal weather**: season-specific packing guidance for the travel dates
+- **Route optimization**: TSP-based estimate of travel time between attractions
+- **Smart scheduling**: attractions placed by time of day (morning gardens, evening viewpoints)
+- **Budget validation**: rejects trips below the destination's minimum viable budget
 
-## 🏗️ System Architecture
+## System Architecture
 
-### Multi-Agent System
+### Multi-Agent Orchestration
 
-TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
+Five agents coordinated by an orchestrator; Research runs first (feeding Planning), then Optimization/Budget/Weather run against the resulting itinerary:
+
+```mermaid
+flowchart TD
+    U[User Request] --> O[Trip Orchestrator]
+    O --> R[Research Agent]
+    R --> P[Planning Agent]
+    P --> Opt[Optimization Agent]
+    P --> B[Budget Agent]
+    P --> W[Weather Agent]
+    Opt --> Resp[Itinerary Response]
+    B --> Resp
+    W --> Resp
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Trip Orchestrator                     │
-│         (Coordinates all agents & manages flow)          │
-└─────────────────────────────────────────────────────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        │                   │                   │
-        ▼                   ▼                   ▼
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Research   │    │   Planning   │    │ Optimization │
-│    Agent     │───▶│    Agent     │───▶│    Agent     │
-└──────────────┘    └──────────────┘    └──────────────┘
-                            │
-                    ┌───────┴────────┐
-                    ▼                ▼
-            ┌──────────────┐  ┌──────────────┐
-            │    Budget    │  │   Weather    │
-            │    Agent     │  │    Agent     │
-            └──────────────┘  └──────────────┘
+
+### Retrieval Pipeline (Research Agent)
+
+Attraction discovery combines live Google Places results with a two-stage retrieval pipeline over the local knowledge base — a standard retrieve-broad, rerank-precise pattern:
+
+```mermaid
+flowchart LR
+    Q[Query] --> S[Semantic Search<br/>ChromaDB]
+    Q --> K[BM25 Keyword Search]
+    S --> F[Reciprocal Rank Fusion<br/>top-20 candidates]
+    K --> F
+    F --> X[Cross-Encoder Rerank<br/>ms-marco-MiniLM-L-6-v2]
+    X --> Top[Top-5 Results]
 ```
+
+Measured impact of each stage is in [Evaluation Results](#evaluation-results).
 
 ### Agent Responsibilities
 
-#### 1. **Research Agent** 🔍
-- **Purpose**: Discovers attractions using RAG + Google Places API
+#### 1. Research Agent
+- **Purpose**: discovers attractions via the retrieval pipeline above plus live Google Places data
 - **Capabilities**:
-  - Hybrid retrieval (BM25 keyword search + ChromaDB semantic search, fused
-    with Reciprocal Rank Fusion) over the local knowledge base, reranked with
-    a cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) - a standard
-    two-stage retrieval pattern: retrieve broad with hybrid search, rerank
-    precise with a cross-encoder. See [Evaluation Results](#-evaluation-results)
-    for before/after retrieval numbers.
+  - Hybrid retrieval + reranking over the local knowledge base for local tips and attraction context (see [Evaluation Results](#evaluation-results) for before/after numbers)
   - Fetches top-rated attractions from Google Places
-  - Combines RAG results with live API data
-  - Selects `trip_duration × 5` attractions for variety
-- **Output**: Curated list of attractions with ratings, coordinates, prices
+  - Combines retrieval results with live API data, selecting `trip_duration × 5` attractions for variety
+- **Output**: curated attraction list with ratings, coordinates, prices
 
-#### 2. **Planning Agent** 📅
-- **Purpose**: Creates day-by-day itineraries with budget awareness
+#### 2. Planning Agent
+- **Purpose**: creates day-by-day itineraries under budget constraints
 - **Capabilities**:
-  - Calculates optimal attractions per day based on budget
-  - Uses city cost multipliers (Bangkok ×0.4, Paris ×1.5, etc.)
-  - Categorizes attractions by best time (morning/evening/night)
-  - Creates 7-slot daily schedule (9 AM - 11 PM)
-  - Estimates costs with city-adjusted pricing
-- **Budget Tiers**:
-  - **Ultra Budget**: 1 attraction/day, street food
-  - **Budget**: 2 attractions/day, casual cafes
-  - **Standard**: 3 attractions/day, local restaurants
-  - **Comfortable**: 4 attractions/day, nice restaurants
-  - **Luxury**: 5 attractions/day, fine dining
-- **Output**: Complete itinerary with activities, times, costs
+  - Calculates optimal attractions per day from budget and city cost multiplier (e.g. Bangkok ×0.4, Paris ×1.5)
+  - Categorizes attractions by best time of day (morning/evening/night)
+  - Builds a 7-slot daily schedule (9 AM–11 PM) with city-adjusted cost estimates
+- **Budget tiers**: Ultra Budget (1/day) → Budget (2) → Standard (3) → Comfortable (4) → Luxury (5 + premium experiences)
+- **Output**: complete itinerary with activities, times, costs
 
-#### 3. **Optimization Agent** 🎯
-- **Purpose**: Analyzes itinerary efficiency
-- **Capabilities**:
-  - Calculates total travel distance using Haversine formula
-  - Estimates time savings from route optimization
-  - Provides efficiency metrics
-- **Note**: Does NOT reorder attractions (preserves time-based scheduling)
-- **Output**: Optimization statistics and metrics
+#### 3. Optimization Agent
+- **Purpose**: analyzes itinerary travel efficiency
+- **Capabilities**: computes total travel distance (Haversine) and estimated time saved versus an unoptimized order
+- **Note**: does not reorder attractions — preserves the time-of-day scheduling from the Planning Agent
+- **Output**: optimization statistics
 
-#### 4. **Budget Agent** 💰
-- **Purpose**: Analyzes costs and provides budget status
-- **Capabilities**:
-  - Converts costs between currencies
-  - Compares trip cost vs user budget
-  - Calculates over/under budget amounts
-  - Provides dual currency display
-- **Output**: Budget analysis with status (under/on/over budget)
+#### 4. Budget Agent
+- **Purpose**: compares trip cost against user budget
+- **Capabilities**: currency conversion, over/under/on-budget status, dual-currency display
+- **Output**: budget analysis with status
 
-#### 5. **Weather Agent** 🌤️
-- **Purpose**: Provides seasonal weather forecasts
-- **Capabilities**:
-  - Knows seasonal patterns for major cities
-  - Provides temperature ranges and conditions
-  - Gives packing advice based on season
-- **Coverage**: Bangkok, Paris, London, Tokyo (expandable)
-- **Output**: Seasonal forecast with packing recommendations
+#### 5. Weather Agent
+- **Purpose**: seasonal forecast for the travel dates
+- **Capabilities**: seasonal temperature/condition patterns and packing guidance for major cities (expandable)
+- **Output**: seasonal forecast with packing recommendations
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **Framework**: FastAPI 0.104
@@ -120,7 +104,7 @@ TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
 - **APIs**:
   - Google Places API (attraction discovery)
   - Google Maps API (route visualization)
-- **Language**: Python 3.12
+- **Language**: Python 3.11+ (developed on 3.12; Docker image pins 3.11 for platform compatibility)
 - **Key Libraries**:
   - `chromadb` - Vector database
   - `rank_bm25` - Keyword retrieval
@@ -142,12 +126,12 @@ TripOptimizer uses 5 specialized AI agents coordinated by an orchestrator:
 - **Algorithms**: TSP optimization, Haversine distance
 - **Deployment**: Netlify (frontend) + Render (backend)
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 ```bash
 # Required
-- Python 3.12+
+- Python 3.11+
 - Node.js 18+
 - npm or yarn
 
@@ -193,7 +177,10 @@ cd ../frontend
 # Install dependencies
 npm install
 
-# No .env needed (API keys handled by backend)
+# Create .env file (VITE_API_BASE_URL falls back to localhost:8000 if unset)
+cat > .env << EOF
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+EOF
 ```
 
 ### Running the Application
@@ -213,7 +200,7 @@ npm run dev
 
 **Access**: http://localhost:5173
 
-## 💡 How It Works
+## How It Works
 
 ### Example: Bangkok 5 Days with ₹50,000 INR
 
@@ -299,7 +286,7 @@ npm run dev
 | Paris | ₹50,000 | ×1.5 | Budget | 2 | ₹48,900 ✅ |
 | London | ₹50,000 | ×1.6 | Budget | 1-2 | ₹51,200 ⚠️ |
 
-## 📊 City Cost Database
+## City Cost Database
 
 ### Expensive Cities (×1.4 - ×1.8)
 - Paris (×1.5), London (×1.6), Tokyo (×1.7)
@@ -318,7 +305,7 @@ npm run dev
 
 **Total**: 90+ cities with cost data
 
-## 💱 Supported Currencies
+## Supported Currencies
 
 49 currencies including:
 - 🇺🇸 USD, 🇪🇺 EUR, 🇬🇧 GBP, 🇯🇵 JPY, 🇮🇳 INR
@@ -326,7 +313,7 @@ npm run dev
 - 🇹🇭 THB, 🇻🇳 VND, 🇮🇩 IDR, 🇲🇾 MYR, 🇵🇭 PHP
 - And 34 more...
 
-## 🎨 Features Showcase
+## Features Showcase
 
 ### 1. Budget Validation
 ```
@@ -359,22 +346,27 @@ What to Pack: Light, breathable clothes. Stay hydrated.
 10:00 PM - Night market (nightlife)
 ```
 
-## 📁 Project Structure
+## Project Structure
 ```
 trip-optimizer/
 ├── backend/
 │   ├── app/
 │   │   ├── agents/
-│   │   │   ├── research_agent.py      # RAG + Google Places
+│   │   │   ├── research_agent.py      # Retrieval + Google Places
 │   │   │   ├── planning_agent.py      # Budget-aware scheduling
 │   │   │   ├── optimization_agent.py  # Route optimization
 │   │   │   ├── budget_agent.py        # Cost analysis
 │   │   │   ├── weather_agent.py       # Seasonal forecasts
 │   │   │   └── orchestrator.py        # Agent coordination
+│   │   ├── retrieval/
+│   │   │   ├── bm25_retriever.py      # Keyword search
+│   │   │   ├── hybrid_retriever.py    # RRF fusion
+│   │   │   └── reranker.py            # Cross-encoder reranking
 │   │   ├── api/
 │   │   │   └── trips.py               # FastAPI endpoints
 │   │   ├── db/
-│   │   │   └── vector_store.py        # ChromaDB setup
+│   │   │   ├── vector_store.py        # ChromaDB setup
+│   │   │   └── seed_attractions.py    # Corpus seeding
 │   │   ├── schemas/
 │   │   │   └── trip.py                # Pydantic models
 │   │   ├── utils/
@@ -382,8 +374,10 @@ trip-optimizer/
 │   │   │   ├── city_costs.py          # City multipliers
 │   │   │   └── currency_converter.py  # Currency conversion
 │   │   └── main.py                    # FastAPI app
+│   ├── eval/                          # Eval harness (see Evaluation Results)
 │   ├── data/
 │   │   └── chroma/                    # ChromaDB storage
+│   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
@@ -398,10 +392,12 @@ trip-optimizer/
 │   │   └── App.jsx
 │   ├── package.json
 │   └── tailwind.config.js
+├── render.yaml                        # Backend deploy config (Render)
+├── DEPLOYMENT.md
 └── README.md
 ```
 
-## 🔧 API Endpoints
+## API Endpoints
 
 ### POST `/api/trips/create`
 
@@ -443,10 +439,10 @@ trip-optimizer/
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 Automated eval harness: `backend/eval/` (see
-[Evaluation Results](#-evaluation-results) above). Run with
+[Evaluation Results](#evaluation-results) above). Run with
 `python -m eval.run_budget_eval`, `run_quality_eval`, or `run_retrieval_eval
 --mode {semantic,hybrid,reranked}` from `backend/`.
 
@@ -471,32 +467,30 @@ Automated eval harness: `backend/eval/` (see
    - Paris March → Spring
    - London December → Winter
 
-## 📊 Evaluation Results
+## Evaluation Results
 
 Quantitative eval harness in `backend/eval/`, run against the real agent
-pipeline (not a mocked simplification) - see `backend/eval/results/` for the
-full per-case JSON reports.
+pipeline rather than a mocked simplification. Full per-case JSON reports are
+in `backend/eval/results/`.
 
-### Budget / Tier Accuracy
+### Budget & Tier Accuracy
 
-44 synthetic test cases spanning the three city-cost tiers (expensive,
-moderate, budget) and budget levels, including boundary cases at tier
-cutoffs. Expected values are computed directly from `budget_calculator`'s
-actual logic, not hand-guessed.
+44 synthetic test cases across the three city-cost tiers and budget levels,
+including boundary cases at tier cutoffs, scored against `budget_calculator`'s
+actual logic (not hand-guessed expected values).
 
 | Metric | Score |
 |---|---|
 | Tier assignment accuracy | 100% |
 | Attractions-per-day accuracy | 100% |
-| Budget status accuracy | 0%* |
+| Budget status accuracy | 0% |
 | Cost estimate mean deviation | 25.7% (n=11 hand-verified subset) |
 
-\* This isn't a harness bug - it's a real finding. `planning_agent`'s actual
-cost formula runs 25-40% cheaper than the tier-selection formula in
-`budget_calculator` predicts, so the pipeline reports "under budget" far
-more often than the tier math alone would suggest. The two formulas were
-never reconciled with each other; the eval surfaced the gap rather than
-papering over it.
+The 0% isn't a harness bug — it's a real finding. `planning_agent`'s actual
+cost formula runs 25–40% cheaper than the tier-selection formula in
+`budget_calculator` predicts, so the two were never reconciled with each
+other and the pipeline reports "under budget" more often than the tier math
+alone would suggest.
 
 ### Itinerary Quality
 
@@ -506,18 +500,17 @@ Three rule-based dimensions scored per generated itinerary (44 cases):
 |---|---|
 | Time-slot appropriateness | 97.4/100 |
 | Attraction diversity | 57.7/100 |
-| Interest-match rate | 100/100** |
+| Interest-match rate | 100/100 |
 
-\*\* Sitting flat at 100 reflects a real methodology limit worth naming: the
-interest-to-category keyword map is broad enough (e.g. "sightseeing" maps to
-generic Places types like `point_of_interest`) that most attractions
-trivially match, so this metric currently has weak discriminative power.
+Interest-match sitting flat at 100 reflects a methodology limit: the
+interest-to-category keyword map is broad enough that most attractions
+trivially match, so it currently has weak discriminative power.
 
 ### RAG Retrieval: Semantic → Hybrid → Reranked
 
-20 manually labeled queries (ground truth = real ChromaDB corpus documents
-tagged with matching destination+category, not LLM-generated labels).
-Precision@5 at each stage of the retrieval pipeline:
+20 manually labeled queries, with ground truth from real ChromaDB corpus
+documents tagged by destination and category (not LLM-generated labels).
+Precision@5 at each stage:
 
 | Stage | Precision@5 |
 |---|---|
@@ -525,76 +518,38 @@ Precision@5 at each stage of the retrieval pipeline:
 | + BM25 hybrid (RRF fusion, no rerank) | 0.89 |
 | + Cross-encoder reranking | 1.00 |
 
-Adding hybrid retrieval on its own didn't move the needle - Reciprocal Rank
-Fusion just re-orders two already-decent rankings without adding new
-judgment. The cross-encoder reranker is what closed the gap: it scores each
-(query, candidate) pair directly instead of aggregating rank positions, and
-that's what fixed cases like "temples in Bangkok," where the semantic-only
-baseline mixed in a Hanoi temple and an unrelated Bangkok nightlife bar.
-Ground truth here is coarse (destination+category match, not a strict top-5
-ranking), so a perfect reranked score reflects a well-separated corpus at
-that granularity, not that ranking within a category is fully solved.
+Hybrid fusion alone didn't move the needle — RRF just re-orders two
+already-decent rankings without adding new judgment. The cross-encoder is
+what closed the gap: scoring each (query, candidate) pair directly fixed
+cases like "temples in Bangkok," where the semantic-only baseline mixed in a
+Hanoi temple and an unrelated nightlife venue. Ground truth here is coarse
+(destination+category match, not a strict ranking), so the perfect reranked
+score reflects a well-separated corpus at that granularity, not that
+per-category ranking is fully solved.
 
-**Note on the live deployment:** the numbers above measure the full
-hybrid+reranked pipeline as implemented. The deployed instance runs with
-reranking disabled (`ENABLE_RERANKING=false`) because the reranker's
-PyTorch dependency pushed the container over Render's free-tier memory
-limit - see `DEPLOYMENT.md` for the full investigation. The live demo
-therefore reflects hybrid retrieval without reranking (0.89 precision@5),
-not the 1.00 figure above.
+The live deployment runs with reranking disabled for memory reasons (see
+[Deployment](#deployment)), so it reflects the 0.89 hybrid figure, not 1.00.
 
-## 🚀 Deployment
+## Deployment
 
-### Current Status
+**Status**: runs fully locally; not currently kept live as a public demo.
 
-The app runs fully locally (frontend + backend, browser hitting
-`localhost:8000`) - that's the primary supported way to use it. Deployment
-artifacts exist and were pushed to real infrastructure (Render backend,
-Netlify frontend) to validate they work, but the project is **not being
-kept live** as a public demo. Here's what was actually verified and why it
-stopped there, documented rather than left as a vague "deployment-ready"
-claim:
+Deployment artifacts (`backend/Dockerfile`, `render.yaml`, `frontend/netlify.toml`)
+were built and validated against real infrastructure — both services were
+actually deployed to Render and Netlify, and a real end-to-end trip
+submission was tested through the live frontend into the live backend. Two
+issues surfaced there: an OOM crash from the reranker's PyTorch dependency
+(fixed — reranking is disabled in the deployed build via `ENABLE_RERANKING`),
+and a request timeout from Render's free-tier proxy hitting
+`research_agent.py`'s sequential (non-parallel) Google Places API calls
+(not fixed — parallelizing those calls would change Research Agent
+orchestration flow, out of scope for this work). Given that, the app is
+kept as a local-first project rather than a flaky public link.
 
-- `backend/Dockerfile` builds and runs cleanly, including under a
-  `docker run --memory=512m` constraint matching Render's free tier
-  (`/health` returns healthy, ~93MB baseline).
-- Backend actually deployed to Render from `render.yaml` and served
-  `/health` successfully at a public URL.
-- Frontend actually deployed to Netlify with the live backend URL baked
-  into the build (`VITE_API_BASE_URL`), and a real end-to-end trip
-  submission was tested through the deployed frontend into the deployed
-  backend.
-- **What didn't work**: real trip requests against the live backend
-  consistently timed out. Render's free-tier proxy enforces a hard
-  ~45-50s request timeout; the same request completes in ~7s locally with
-  mocked Places data, so the bottleneck is specifically the cumulative
-  latency of `research_agent.py`'s ~7-10 *sequential* real Google Places
-  API calls plus Groq calls - not something masked before since prior
-  testing used mocked Places data (see the "no paid Places calls" note in
-  Phase 0). Fixing this properly means parallelizing those calls, which
-  changes Research Agent orchestration flow - out of scope per the
-  "don't modify agent orchestration logic" constraint on this work, so
-  it's documented as a known limitation rather than worked around.
+Full investigation, exact env vars, and redeploy steps are in
+[`DEPLOYMENT.md`](./DEPLOYMENT.md).
 
-See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full investigation
-(including a real OOM crash that was fixed first) and the exact steps if
-someone wants to pick this back up.
-
-### Deployment Plan (as prepared)
-
-- **Frontend**: Netlify (`frontend/netlify.toml`)
-- **Backend**: Render, via the Dockerfile (`render.yaml` Blueprint)
-- **ChromaDB persistence**: bundled into the backend image at build time
-  rather than a runtime disk (Render's free plan doesn't include one) -
-  see `DEPLOYMENT.md` for why.
-- **Reranking**: disabled in the deployed backend (`ENABLE_RERANKING=false`)
-  after a real OOM crash - see `DEPLOYMENT.md` and the Evaluation Results
-  note above.
-
-Originally targeted Railway + Vercel per the spec; switched to Render +
-Netlify after both hit expired free-trial billing during setup.
-
-## 📈 Future Enhancements
+## Future Enhancements
 
 - [ ] Flight booking integration
 - [ ] Hotel recommendations
@@ -607,25 +562,21 @@ Netlify after both hit expired free-trial billing during setup.
 - [ ] Local SIM card suggestions
 - [ ] Restaurant reservations
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 👨‍💻 Author
+## Author
 
 **Sowmya Yerraguntla**
 
 - LinkedIn: [Sowmya Yerraguntla](https://www.linkedin.com/in/sowmyayerraguntla/)
 
-## 📊 Project Stats
+## Project Stats
 
-- **Lines of Code**: ~8,000+
-- **Agents**: 5 specialized AI agents
-- **Cities Supported**: 90+
+- **Lines of code**: ~4,700 (backend ~2,800, eval harness ~1,200, frontend ~700)
+- **Agents**: 5, plus a two-stage retrieval pipeline (BM25 + semantic, cross-encoder reranked)
+- **Cities supported**: 90+
 - **Currencies**: 49
-- **API Integrations**: 3 (Groq, Google Places, Google Maps)
-- **Development Time**: 4 weeks
-
----
-
-**Built with ❤️ for travelers who want to maximize experiences within their budget**
+- **Eval coverage**: 44 budget/tier cases, 44 quality-scored itineraries, 20 labeled retrieval queries
+- **External APIs**: Groq, Google Places, Google Maps
